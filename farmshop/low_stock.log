@@ -1,0 +1,4 @@
+Not Found: /api/products/1/
+"GET /api/products/1/ HTTP/1.1" 404 17521
+Bad Request: /api/products/4/
+"PUT /api/products/4/ HTTP/1.1" 400 18270

@@ -1,4 +1,7 @@
+import logging
 from django.db import models
+
+logger = logging.getLogger(__name__)
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -12,9 +15,7 @@ class Product(models.Model):
         ('kg', 'Kilogram'),
         ('piece', 'Piece'),
         ('litre', 'Litre'),
-
     ]
-
 
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -24,8 +25,8 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     unit_of_measure = models.CharField(
         max_length=20,
-        choices=UNIT_CHOICES,  # Limite les options au choix défini
-        default='piece'  # Valeur par défaut si aucune unité n'est définie
+        choices=UNIT_CHOICES,
+        default='piece'
     )
     category = models.ForeignKey(
         Category,
@@ -33,6 +34,16 @@ class Product(models.Model):
         null=True,
         blank=True
     )
+
+    def check_stock(self):
+        """ Vérifie si le stock est bas et log un message """
+        if self.stock <= self.low_stock_threshold:
+            logger.warning(f"Low stock alert: {self.name} has only {self.stock} left!")
+
+    def save(self, *args, **kwargs):
+        """ Vérifie le stock avant de sauvegarder """
+        self.check_stock()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
