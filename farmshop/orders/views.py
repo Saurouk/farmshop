@@ -13,20 +13,26 @@ from .permissions import IsAdminUser  # Assure-toi que cette permission est bien
 
 logger = logging.getLogger(__name__)
 
+
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """
-        Convertir le panier en commande
+        Convertir le panier en commande avec des messages d'erreur plus détaillés.
         """
         try:
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
-            return Response({"error": "Cart is empty"}, status=400)
+            return Response({"error": "Votre panier est vide. Ajoutez des produits avant de passer une commande."}, status=400)
 
         if not cart.items.exists():
-            return Response({"error": "Cart is empty"}, status=400)
+            return Response({"error": "Votre panier est vide. Ajoutez des produits avant de passer une commande."}, status=400)
+
+        # Vérifier si une commande déjà payée existe
+        existing_order = Order.objects.filter(user=request.user, status='paid').exists()
+        if existing_order:
+            return Response({"error": "Vous avez déjà une commande payée en attente."}, status=400)
 
         # Créer une commande
         order = Order.objects.create(user=request.user, total_price=0)
@@ -35,7 +41,13 @@ class CreateOrderView(APIView):
         for item in cart.items.all():
             if item.quantity > item.product.stock:
                 return Response(
-                    {"error": f"Not enough stock for {item.product.name}"},
+                    {"error": f"Stock insuffisant : {item.product.stock} unités restantes pour {item.product.name}."},
+                    status=400,
+                )
+
+            if not item.product.is_available:
+                return Response(
+                    {"error": f"Le produit {item.product.name} n'est plus disponible."},
                     status=400,
                 )
 
@@ -54,7 +66,7 @@ class CreateOrderView(APIView):
         order.save()
         cart.items.all().delete()
 
-        return Response({"message": "Order created successfully", "order_id": order.id}, status=201)
+        return Response({"message": "Commande créée avec succès", "order_id": order.id}, status=201)
 
 
 class UserOrdersView(ListAPIView):
@@ -118,15 +130,15 @@ class AdminOrderActionsView(APIView):
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
-            return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Commande introuvable."}, status=status.HTTP_404_NOT_FOUND)
 
         new_status = request.data.get('status')
         if new_status not in dict(Order.STATUS_CHOICES):
-            return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Statut invalide."}, status=status.HTTP_400_BAD_REQUEST)
 
         order.status = new_status
         order.save()
-        return Response({"message": f"Order {order_id} status updated to {new_status}."}, status=status.HTTP_200_OK)
+        return Response({"message": f"Commande {order_id} mise à jour avec le statut {new_status}."}, status=status.HTTP_200_OK)
 
     def delete(self, request, order_id):
         """
@@ -135,12 +147,12 @@ class AdminOrderActionsView(APIView):
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
-            return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Commande introuvable."}, status=status.HTTP_404_NOT_FOUND)
 
         if order.status in ['shipped', 'delivered']:
-            return Response({"error": "Cannot cancel an order already shipped or delivered."},
+            return Response({"error": "Impossible d'annuler une commande déjà expédiée ou livrée."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         order.status = 'canceled'
         order.save()
-        return Response({"message": f"Order {order_id} has been canceled."}, status=status.HTTP_200_OK)
+        return Response({"message": f"Commande {order_id} annulée avec succès."}, status=status.HTTP_200_OK)

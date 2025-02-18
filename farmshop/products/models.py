@@ -29,7 +29,7 @@ class Product(models.Model):
         default='piece'
     )
     category = models.ForeignKey(
-        Category,
+        'Category',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
