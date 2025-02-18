@@ -34,6 +34,14 @@ class AddItemToCartView(APIView):
         except Product.DoesNotExist:
             return Response({'error': 'Product does not exist'}, status=404)
 
+        # Vérifier si le produit est disponible
+        if not product.is_available:
+            return Response({'error': f"{product.name} is not available."}, status=400)
+
+        # Vérifier si le produit est en rupture de stock
+        if product.stock == 0:
+            return Response({'error': f"{product.name} is out of stock and cannot be added to cart."}, status=400)
+
         if quantity > product.stock:
             return Response({'error': f"Only {product.stock} units available."}, status=400)
 
@@ -52,9 +60,7 @@ class AddItemToCartView(APIView):
 
         # Vérification du seuil critique
         if product.is_low_stock():
-            # Option 1 : Ajouter un log
             print(f"Low stock alert for {product.name}. Only {product.stock} left.")
-            # Option 2 : Envoi de notification par email
 
         return Response({'message': f"{quantity} unit(s) of {product.name} added to cart."}, status=201)
 

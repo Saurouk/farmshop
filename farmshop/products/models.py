@@ -35,9 +35,13 @@ class Product(models.Model):
         blank=True
     )
 
+    def is_low_stock(self):
+        """ Vérifie si le stock est sous le seuil critique """
+        return self.stock <= self.low_stock_threshold
+
     def check_stock(self):
         """ Vérifie si le stock est bas et log un message """
-        if self.stock <= self.low_stock_threshold:
+        if self.is_low_stock():
             logger.warning(f"Low stock alert: {self.name} has only {self.stock} left!")
 
     def save(self, *args, **kwargs):

@@ -77,3 +77,122 @@ Traceback (most recent call last):
        ^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'Product' object has no attribute 'is_low_stock'
 "POST /api/cart/add_item/ HTTP/1.1" 500 97001
+Method Not Allowed: /api/cart/add_item/
+"GET /api/cart/add_item/ HTTP/1.1" 405 11200
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11179
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11179
+Not Found: /products/product/3/change/
+"GET /products/product/3/change/ HTTP/1.1" 404 3155
+Not Found: /products/product/3
+"GET /products/product/3 HTTP/1.1" 404 3131
+Not Found: /api/products/{3}/
+"GET /api/products/%7B3%7D/ HTTP/1.1" 404 17548
+Not Found: /api/products/{3}/
+"PUT /api/products/%7B3%7D/ HTTP/1.1" 404 17548
+Method Not Allowed: /api/cart/add_item/
+"GET /api/cart/add_item/ HTTP/1.1" 405 11200
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11195
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11222
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11179
+Internal Server Error: /api/cart/add_item/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 62, in post
+    if product.is_low_stock():
+       ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Product' object has no attribute 'is_low_stock'
+"POST /api/cart/add_item/ HTTP/1.1" 500 96944
+Method Not Allowed: /api/cart/add_item/
+"GET /api/cart/add_item/ HTTP/1.1" 405 11200
+Internal Server Error: /api/cart/add_item/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 62, in post
+    if product.is_low_stock():
+       ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Product' object has no attribute 'is_low_stock'
+"POST /api/cart/add_item/ HTTP/1.1" 500 96944
+Method Not Allowed: /api/cart/add_item/
+"GET /api/cart/add_item/ HTTP/1.1" 405 11200
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11187
+Internal Server Error: /api/cart/add_item/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 62, in post
+    if product.is_low_stock():
+       ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Product' object has no attribute 'is_low_stock'
+"POST /api/cart/add_item/ HTTP/1.1" 500 96944
+Method Not Allowed: /api/cart/add_item/
+"GET /api/cart/add_item/ HTTP/1.1" 405 11200
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
