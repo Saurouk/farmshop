@@ -1,36 +1,57 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import Product, Rental, Category
-from .serializers import ProductSerializer, RentalSerializer, CategorySerializer  # Vérifier l'importation correcte
+from .serializers import ProductSerializer, RentalSerializer, CategorySerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]  # Protège l'API avec JWT
+    permission_classes = [IsAuthenticated]
 
-    # Ajout les options de recherche et filtrage
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category__name']  # Filtrer par nom de catégorie
-    search_fields = ['name', 'description']  # Rechercher dans les noms et descriptions
+    filterset_fields = ['category__name']
+    search_fields = ['name', 'description']
 
     def get_permissions(self):
-        """
-        Définir les permissions selon le type de requête :
-        - GET (liste des produits) → accessible à tout le monde (y compris non connectés).
-        - POST, PUT, DELETE → réservé aux administrateurs.
-        """
         if self.request.method == 'GET':
-            return [permissions.AllowAny()]  # Tout le monde peut voir la liste des produits
-        return [permissions.IsAdminUser()]  # Seul l'admin peut ajouter/modifier/supprimer
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
-# 🚀 Correction : Sortie de `CategoryViewSet` en dehors de `ProductViewSet`
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAdminUser]  # Seuls les admins peuvent créer/modifier/supprimer
+    permission_classes = [permissions.IsAdminUser]
 
 class RentalViewSet(viewsets.ModelViewSet):
     queryset = Rental.objects.all()
     serializer_class = RentalSerializer
-    permission_classes = [IsAuthenticated]  # Protège les locations avec JWT
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get('product_id')
+        start_date = request.data.get('start_date')
+        end_date = request.data.get('end_date')
+
+        # Vérifier si le produit existe
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Vérifier si le produit est bien louable
+        if not product.is_rentable:
+            return Response({'error': 'This product is not available for rent'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Créer la location
+        rental = Rental.objects.create(
+            product=product,
+            user=request.user,  # ✅ Récupère automatiquement l'utilisateur connecté
+            start_date=start_date,
+            end_date=end_date,
+            is_active=True
+        )
+
+        return Response({'message': 'Rental created successfully', 'rental_id': rental.id}, status=status.HTTP_201_CREATED)

@@ -196,3 +196,17 @@ Method Not Allowed: /api/cart/add_item/
 "GET /api/cart/add_item/ HTTP/1.1" 405 11200
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 11187
+Bad Request: /api/products/3/
+"PUT /api/products/3/ HTTP/1.1" 400 17852
+Not Found: /api/rentals/create/
+"GET /api/rentals/create/ HTTP/1.1" 404 17496
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17546
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /api/rentals/create/
+"GET /api/rentals/create/ HTTP/1.1" 404 17496
