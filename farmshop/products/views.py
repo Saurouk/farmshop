@@ -45,10 +45,14 @@ class RentalViewSet(viewsets.ModelViewSet):
         if not product.is_rentable:
             return Response({'error': 'This product is not available for rent'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # **Vérifier si le produit est en stock**
+        if product.stock <= 0:
+            return Response({'error': 'Product out of stock.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Créer la location
         rental = Rental.objects.create(
             product=product,
-            user=request.user,  # ✅ Récupère automatiquement l'utilisateur connecté
+            user=request.user,
             start_date=start_date,
             end_date=end_date,
             is_active=True

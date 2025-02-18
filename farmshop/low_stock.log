@@ -210,3 +210,27 @@ Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
 Not Found: /api/rentals/create/
 "GET /api/rentals/create/ HTTP/1.1" 404 17496
+Bad Request: /api/rentals/
+"POST /api/rentals/ HTTP/1.1" 400 16169
+Not Found: /api/rentals/{1}/
+"GET /api/rentals/%7B1%7D/ HTTP/1.1" 404 17498
+Not Found: /api/rentals/{1}/
+"DELETE /api/rentals/%7B1%7D/ HTTP/1.1" 404 17501
+Not Found: /api/rentals/{1}/
+"GET /api/rentals/%7B1%7D/ HTTP/1.1" 404 17498
+Bad Request: /api/products/3/
+"PUT /api/products/3/ HTTP/1.1" 400 17852
+Not Found: /api/rentals/3/
+"PUT /api/rentals/3/ HTTP/1.1" 404 17470
+Not Found: /api/rentals/3/
+"PATCH /api/rentals/3/ HTTP/1.1" 404 17472
+Not Found: /api/rentals/3/
+"PUT /api/rentals/3/ HTTP/1.1" 404 17470
+Not Found: /api/rentals/3/
+"GET /api/rentals/3/ HTTP/1.1" 404 17470
+Not Found: /api/rentals/
+"POST /api/rentals/ HTTP/1.1" 404 16146
+Not Found: /api/rentals/3/
+"GET /api/rentals/3/ HTTP/1.1" 404 17470
+Bad Request: /api/products/3/
+"PATCH /api/products/3/ HTTP/1.1" 400 17546
