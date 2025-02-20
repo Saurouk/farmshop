@@ -234,3 +234,5 @@ Not Found: /api/rentals/3/
 "GET /api/rentals/3/ HTTP/1.1" 404 17470
 Bad Request: /api/products/3/
 "PATCH /api/products/3/ HTTP/1.1" 400 17546
+Bad Request: /api/rentals/
+"POST /api/rentals/ HTTP/1.1" 400 16152
