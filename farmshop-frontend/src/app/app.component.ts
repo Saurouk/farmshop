@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ProductListComponent } from './components/product-list/product-list.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  imports: [ProductListComponent],  // ✅ Ajout du composant ici !
+  template: `
+    <h1>Welcome to FarmShop</h1>
+    <app-product-list></app-product-list> <!-- Affichage des produits -->
+  `,
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'farmshop-frontend';
-}
+export class AppComponent {}

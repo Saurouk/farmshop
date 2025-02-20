@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../services/product.service'; // Import du service
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-list',
