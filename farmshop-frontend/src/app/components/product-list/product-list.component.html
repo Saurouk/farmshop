@@ -1,11 +1,27 @@
-<div class="product-container">
-  <h2>Nos Produits</h2>
-  <div *ngIf="products.length === 0">Chargement des produits...</div>
+<div class="container mt-4">
+  <h2 class="text-center text-primary">Nos Produits</h2>
 
-  <div *ngFor="let product of products" class="product-card">
-    <h3>{{ product.name }}</h3>
-    <p>{{ product.description }}</p>
-    <p><strong>Prix:</strong> {{ product.price }} €</p>
-    <p><strong>Stock:</strong> {{ product.stock }}</p>
+
+
+  <!-- Message de chargement -->
+  <div *ngIf="products.length === 0" class="alert alert-info text-center">
+    Chargement des produits...
+  </div>
+
+  <!-- Affichage des produits sous forme de cartes Bootstrap -->
+  <div class="row">
+    <div *ngFor="let product of products" class="col-md-4">
+      <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+        <div class="card-body">
+          <h3 class="card-title text-dark">{{ product.name }}</h3>
+          <p class="card-text">{{ product.description }}</p>
+          <p><strong>Prix:</strong> {{ product.price }} €</p>
+          <p><strong>Stock:</strong> {{ product.stock }}</p>
+
+          <!-- Bouton Acheter -->
+          <button class="btn btn-success w-100">Acheter</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
