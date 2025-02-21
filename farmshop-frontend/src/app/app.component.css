@@ -63,3 +63,10 @@ footer a {
 footer a:hover {
   color: #FFD700;
 }
+
+.logo {
+  border: 2px solid red; /* ✅ Ajoute un contour rouge pour voir si l'élément est bien là */
+  width: 150px;
+  height: auto;
+  margin-right: 10px;
+}
