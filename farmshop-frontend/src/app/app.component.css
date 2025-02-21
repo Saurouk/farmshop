@@ -1,0 +1,65 @@
+/* ✅ Style global */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #F5F5F5;
+  color: #333;
+}
+
+/* ✅ Navbar */
+.navbar {
+  background: #2E7D32; /* Vert foncé */
+  padding: 15px;
+}
+
+.navbar .nav-link {
+  color: white !important;
+  font-weight: bold;
+}
+
+.navbar .nav-link:hover {
+  color: #F4C842 !important; /* Jaune doré */
+}
+
+/* ✅ Produits */
+.product-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+/* ✅ Boutons */
+.btn-primary {
+  background: #F4C842; /* Jaune blé */
+  color: #2E7D32;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background: #FFD700; /* Jaune or */
+  color: #1B5E20; /* Vert plus foncé */
+}
+
+/* ✅ Footer */
+footer {
+  background: #333;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+}
+
+footer a {
+  color: #F4C842;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: #FFD700;
+}

@@ -1,27 +1,51 @@
-<div class="container mt-4">
-  <h2 class="text-center text-primary">Nos Produits</h2>
+<div class="container">
+  <h2 class="text-center mt-4">Nos Produits</h2>
 
+  <!-- Barre de recherche et filtre -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Rechercher un produit..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()">
+    </div>
 
-
-  <!-- Message de chargement -->
-  <div *ngIf="products.length === 0" class="alert alert-info text-center">
-    Chargement des produits...
+    <div class="col-md-6">
+      <select
+        class="form-control"
+        [(ngModel)]="selectedCategory"
+        (change)="onCategoryChange()">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let category of categories; trackBy: trackByCategory" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
   </div>
 
-  <!-- Affichage des produits sous forme de cartes Bootstrap -->
-  <div class="row">
-    <div *ngFor="let product of products" class="col-md-4">
-      <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-        <div class="card-body">
-          <h3 class="card-title text-dark">{{ product.name }}</h3>
-          <p class="card-text">{{ product.description }}</p>
-          <p><strong>Prix:</strong> {{ product.price }} €</p>
-          <p><strong>Stock:</strong> {{ product.stock }}</p>
+  <!-- Liste des produits -->
+  <div class="product-slider-container">
+    <button class="slider-btn left" (click)="scrollLeft()">❮</button>
 
-          <!-- Bouton Acheter -->
-          <button class="btn btn-success w-100">Acheter</button>
+    <div class="product-slider">
+      <div class="product-card" *ngFor="let product of filteredProducts; trackBy: trackByProduct">
+        <img [src]="product.imageUrl" class="product-img" [alt]="product.name">
+        <div class="product-info">
+          <h5>{{ product.name }}</h5>
+          <p><strong>{{ product.price }}€</strong></p>
+          <p class="text-muted">{{ product.category }}</p>
+          <button class="btn btn-primary">Voir plus</button>
         </div>
       </div>
     </div>
+
+    <button class="slider-btn right" (click)="scrollRight()">❯</button>
+  </div>
+
+  <!-- Message si aucun produit trouvé -->
+  <div *ngIf="filteredProducts.length === 0" class="text-center mt-4">
+    <p class="alert alert-warning">Aucun produit trouvé.</p>
   </div>
 </div>
