@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Blog</h1>
+    <h1>Produits</h1>
     <p>Découvrez nos articles et conseils.</p>
   </div>
 </template>
