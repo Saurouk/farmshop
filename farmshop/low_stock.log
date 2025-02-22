@@ -240,3 +240,11 @@ Not Found: /
 "GET / HTTP/1.1" 404 3059
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /api/products/1/
+"GET /api/products/1/ HTTP/1.1" 404 10094
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /api/products/1/
+"GET /api/products/1/ HTTP/1.1" 404 10094
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
