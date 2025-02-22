@@ -1,7 +1,7 @@
 <div class="container">
   <h2 class="text-center mt-4">Nos Produits</h2>
 
-  <!-- Barre de recherche et filtre -->
+  <!-- ✅ Barre de recherche et filtre -->
   <div class="row mb-4">
     <div class="col-md-6">
       <input
@@ -13,30 +13,29 @@
     </div>
 
     <div class="col-md-6">
-      <select
-        class="form-control"
-        [(ngModel)]="selectedCategory"
-        (change)="onCategoryChange()">
-        <option value="">Toutes les catégories</option>
-        <option *ngFor="let category of categories; trackBy: trackByCategory" [value]="category">
-          {{ category }}
-        </option>
+      <select class="form-control" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+        <option value="" selected>Toutes les catégories</option>
+        <ng-container *ngFor="let category of categories; trackBy: trackByCategory">
+          <option *ngIf="category !== 'Toutes les catégories'" [value]="category">
+            {{ category }}
+          </option>
+        </ng-container>
       </select>
     </div>
   </div>
 
-  <!-- Liste des produits -->
-  <div class="product-slider-container">
+  <!-- ✅ Carrousel des produits -->
+  <div class="carousel-container">
     <button class="slider-btn left" (click)="scrollLeft()">❮</button>
 
-    <div class="product-slider">
+    <div class="carousel-wrapper" #productSlider>
       <div class="product-card" *ngFor="let product of filteredProducts; trackBy: trackByProduct">
         <img [src]="product.imageUrl" class="product-img" [alt]="product.name">
         <div class="product-info">
           <h5>{{ product.name }}</h5>
           <p><strong>{{ product.price }}€</strong></p>
           <p class="text-muted">{{ product.category }}</p>
-          <button class="btn btn-primary">Voir plus</button>
+          <button class="btn btn-primary" (click)="viewProductDetails(product.id)">Voir plus</button>
         </div>
       </div>
     </div>
@@ -44,7 +43,7 @@
     <button class="slider-btn right" (click)="scrollRight()">❯</button>
   </div>
 
-  <!-- Message si aucun produit trouvé -->
+  <!-- ✅ Message si aucun produit trouvé -->
   <div *ngIf="filteredProducts.length === 0" class="text-center mt-4">
     <p class="alert alert-warning">Aucun produit trouvé.</p>
   </div>

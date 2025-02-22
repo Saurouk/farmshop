@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { ProductService } from '../../services/product.service';
-import { CommonModule } from '@angular/common'; // ✅ Import de CommonModule
-import { FormsModule } from '@angular/forms'; // ✅ Import pour ngModel
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
-// ✅ Définition de l'interface Product pour un typage strict
 interface Product {
   id: number;
   name: string;
@@ -14,12 +14,12 @@ interface Product {
 
 @Component({
   selector: 'app-product-list',
-  standalone: true, // ✅ Assure que c'est un composant autonome
-  imports: [CommonModule, FormsModule], // ✅ Ajout de CommonModule et FormsModule ici
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, AfterViewInit {
   @ViewChild('productSlider', { static: false }) productSlider!: ElementRef;
 
   products: Product[] = [];
@@ -28,10 +28,16 @@ export class ProductListComponent implements OnInit {
   selectedCategory: string = '';
   categories: string[] = [];
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadProducts();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.productSlider) {
+      console.log('✅ Slider détecté:', this.productSlider.nativeElement);
+    }
   }
 
   loadProducts(): void {
@@ -41,10 +47,9 @@ export class ProductListComponent implements OnInit {
         this.products = data;
         this.filteredProducts = data;
 
-        // ✅ Vérification que category est bien un string avant de l'utiliser
-        this.categories = ['Toutes les catégories', ...Array.from(new Set(
-          data.map((p: Product) => String(p.category))
-        ))];
+        // ✅ Correction de la duplication de "Toutes les catégories"
+        const uniqueCategories = Array.from(new Set(data.map(p => p.category))).filter(Boolean);
+        this.categories = uniqueCategories;
 
         console.log('📌 Catégories extraites :', this.categories);
       },
@@ -54,21 +59,14 @@ export class ProductListComponent implements OnInit {
     );
   }
 
-  /**
-   * ✅ Filtrer les produits selon la recherche et la catégorie sélectionnée
-   */
   applyFilters(): void {
-    console.log('🛠️ Filtrage en cours...');
-    console.log('🔍 Recherche :', this.searchQuery);
-    console.log('📂 Catégorie :', this.selectedCategory);
-
     this.filteredProducts = this.products.filter(product => {
       const matchesSearch = this.searchQuery
-        ? String(product.name).toLowerCase().includes(this.searchQuery.toLowerCase())
+        ? product.name.toLowerCase().includes(this.searchQuery.toLowerCase())
         : true;
 
-      const matchesCategory = this.selectedCategory && this.selectedCategory !== 'Toutes les catégories'
-        ? String(product.category) === this.selectedCategory
+      const matchesCategory = this.selectedCategory !== ''
+        ? product.category === this.selectedCategory
         : true;
 
       return matchesSearch && matchesCategory;
@@ -78,40 +76,39 @@ export class ProductListComponent implements OnInit {
   }
 
   onSearch(): void {
-    console.log('🔍 Recherche déclenchée avec :', this.searchQuery);
     this.applyFilters();
   }
 
   onCategoryChange(): void {
-    console.log('📂 Changement de catégorie détecté :', this.selectedCategory);
     this.applyFilters();
   }
 
-  /**
-   * ✅ Optimisation du rendu des catégories dans *ngFor
-   */
   trackByCategory(index: number, category: string): string {
     return category;
   }
 
-  /**
-   * ✅ Optimisation du rendu des produits dans *ngFor
-   */
   trackByProduct(index: number, product: Product): number {
     return product.id;
   }
 
   /**
-   * ✅ Ajout du défilement horizontal pour les produits en utilisant ViewChild
+   * ✅ Correction du bouton "Voir plus" : Navigation correcte
+   */
+  viewProductDetails(productId: number): void {
+    this.router.navigate(['/product-detail', productId]);
+  }
+
+  /**
+   * ✅ Correction du défilement horizontal des produits
    */
   scrollLeft(): void {
-    if (this.productSlider) {
+    if (this.productSlider?.nativeElement) {
       this.productSlider.nativeElement.scrollBy({ left: -300, behavior: 'smooth' });
     }
   }
 
   scrollRight(): void {
-    if (this.productSlider) {
+    if (this.productSlider?.nativeElement) {
       this.productSlider.nativeElement.scrollBy({ left: 300, behavior: 'smooth' });
     }
   }

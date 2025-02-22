@@ -1,76 +1,58 @@
-/* Conteneur du slider */
-.product-slider-container {
+.carousel-container {
   position: relative;
   width: 100%;
   overflow: hidden;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
-/* Zone de défilement horizontal */
-.product-slider {
+.carousel-wrapper {
   display: flex;
-  gap: 15px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding-bottom: 10px;
+  gap: 20px;
+  padding: 10px;
+  white-space: nowrap;
 }
 
-/* Masquer la barre de défilement */
-.product-slider::-webkit-scrollbar {
-  display: none;
+.carousel-wrapper::-webkit-scrollbar {
+  display: none; /* Masquer la barre de défilement */
 }
 
-/* Cartes des produits */
 .product-card {
   min-width: 250px;
-  flex: 0 0 auto;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  max-width: 250px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   padding: 15px;
-  transition: transform 0.3s ease-in-out;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
-.product-card:hover {
-  transform: scale(1.05);
-}
-
-/* Image du produit */
 .product-img {
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-bottom: 2px solid #007bff;
+  height: auto;
+  border-radius: 5px;
 }
 
-/* Infos produit */
-.product-info {
-  padding: 10px;
-}
-
-/* Boutons de navigation */
 .slider-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 10px;
   cursor: pointer;
   border-radius: 50%;
-  font-size: 20px;
-  z-index: 100;
 }
 
 .slider-btn.left {
-  left: 10px;
+  left: 0;
 }
 
 .slider-btn.right {
-  right: 10px;
+  right: 0;
 }
 
 .slider-btn:hover {
