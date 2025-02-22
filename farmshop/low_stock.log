@@ -236,3 +236,7 @@ Bad Request: /api/products/3/
 "PATCH /api/products/3/ HTTP/1.1" 400 17546
 Bad Request: /api/rentals/
 "POST /api/rentals/ HTTP/1.1" 400 16152
+Not Found: /
+"GET / HTTP/1.1" 404 3059
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
