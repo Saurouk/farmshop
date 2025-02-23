@@ -65,6 +65,9 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -89,9 +92,7 @@ STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
 STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET')
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Frontend Angular
-]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

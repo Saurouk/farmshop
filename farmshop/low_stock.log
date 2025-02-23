@@ -248,3 +248,15 @@ Not Found: /api/products/1/
 "GET /api/products/1/ HTTP/1.1" 404 10094
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /
+"GET / HTTP/1.1" 404 3059
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /products
+"GET /products HTTP/1.1" 404 3101
+Not Found: /http://localhost:8000/api/products/
+"GET /http://localhost:8000/api/products/ HTTP/1.1" 404 3182
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
