@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <h1>Produits</h1>
-    <p>Découvrez nos articles et conseils.</p>
+  <div class="container py-5">
+    <h1>Nos Produits 🌽</h1>
+    <p>Ici, vous trouverez bientôt tous nos produits agricoles.</p>
   </div>
 </template>
-
-<script setup>
-</script>

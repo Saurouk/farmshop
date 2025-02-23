@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <h1>Blog</h1>
-    <p>Découvrez nos articles et conseils.</p>
+  <div class="container py-5">
+    <h1>Blog 📚</h1>
+    <p>Découvrez nos actualités, conseils et infos agricoles.</p>
   </div>
 </template>
-
-<script setup>
-</script>

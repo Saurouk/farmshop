@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <h1>Contact</h1>
-    <p>Besoin d'informations ? Contactez-nous.</p>
+  <div class="container py-5">
+    <h1>Contactez-nous 📞</h1>
+    <p>Un formulaire de contact sera bientôt disponible.</p>
   </div>
 </template>
-
-<script setup>
-</script>

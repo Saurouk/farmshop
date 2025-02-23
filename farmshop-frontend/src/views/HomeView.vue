@@ -1,15 +1,6 @@
 <template>
-  <div>
-    <h1>Bienvenue sur FarmShop</h1>
-    <p>Découvrez nos produits agricoles frais et locaux.</p>
+  <div class="container py-5">
+    <h1>Accueil 🌾</h1>
+    <p>Bienvenue chez FarmShop, votre magasin agricole en ligne.</p>
   </div>
 </template>
-
-<script setup>
-</script>
-
-<style scoped>
-h1 {
-  color: #2E7D32;
-}
-</style>

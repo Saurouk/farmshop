@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <h1>Détail du produit</h1>
-    <p>Ici, nous afficherons les détails du produit sélectionné.</p>
+  <div class="container py-5">
+    <h1>Détails du Produit 📦</h1>
+    <p>Vous retrouverez ici bientôt les détails précis de chaque produit.</p>
   </div>
 </template>
-
-<script setup>
-</script>
