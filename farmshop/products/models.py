@@ -10,7 +10,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Product(models.Model):
     UNIT_CHOICES = [
         ('kg', 'Kilogram'),
@@ -23,7 +22,6 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
     low_stock_threshold = models.PositiveIntegerField(default=5)
-    is_available = models.BooleanField(default=True)
     is_rentable = models.BooleanField(default=False)
     unit_of_measure = models.CharField(
         max_length=20,
@@ -37,6 +35,11 @@ class Product(models.Model):
         blank=True
     )
 
+    @property
+    def is_available(self):
+        """ Retourne True si le produit est en stock """
+        return self.stock > 0
+
     def check_stock(self):
         """ Vérifie si le stock est bas et log un message """
         if self.stock <= self.low_stock_threshold:
@@ -49,7 +52,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Rental(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

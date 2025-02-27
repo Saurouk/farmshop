@@ -6,29 +6,26 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name']  # Champs à afficher pour les catégories
 
-
 class ProductSerializer(serializers.ModelSerializer):
-    # Liaison avec la catégorie (lecture et écriture)
     category_id = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),  # Liste des catégories disponibles
-        source='category',  # Le champ de modèle correspondant
-        write_only=True  # Ce champ est utilisé uniquement lors des requêtes POST/PUT
+        queryset=Category.objects.all(),
+        source='category',
+        write_only=True
     )
-    category = serializers.StringRelatedField(read_only=True)  # Affiche le nom de la catégorie dans les réponses
-
-    # Affichage des choix disponibles pour l'unité de mesure
+    category = serializers.StringRelatedField(read_only=True)
     unit_of_measure = serializers.ChoiceField(
-        choices=Product.UNIT_CHOICES,  # Options disponibles définies dans le modèle
+        choices=Product.UNIT_CHOICES,
         default='piece'
     )
+    is_available = serializers.ReadOnlyField()  # ✅ Champs dynamique, pas stocké en base
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'stock',
+            'low_stock_threshold',  # ✅ Champ toujours présent
             'is_available', 'category_id', 'category', 'unit_of_measure'
         ]
-
 
 class RentalSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Comment
+from .models import Article, Comment, Report
 
 class ArticleSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')  # Afficher le nom de l'auteur
@@ -17,4 +17,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'article', 'article_title', 'user', 'content', 'created_at']
 
+class ReportSerializer(serializers.ModelSerializer):
+    reporter = serializers.ReadOnlyField(source='reporter.username')
+    reported_comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all())
+
+    class Meta:
+        model = Report
+        fields = ['id', 'reporter', 'reported_comment', 'reason', 'created_at', 'resolved']
 

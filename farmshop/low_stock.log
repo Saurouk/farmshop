@@ -260,3 +260,59 @@ Not Found: /http://localhost:8000/api/products/
 "GET /http://localhost:8000/api/products/ HTTP/1.1" 404 3182
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /
+"GET / HTTP/1.1" 404 3059
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 10099
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"PATCH /api/products/create/ HTTP/1.1" 404 17258
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"PUT /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"PATCH /api/products/create/ HTTP/1.1" 404 17258
+Not Found: /api/create
+"GET /api/create HTTP/1.1" 404 11951
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"PUT /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17256
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17566
+Not Found: /api/products/create/
+"PUT /api/products/create/ HTTP/1.1" 404 17566
+Not Found: /api/products/create/
+"PATCH /api/products/create/ HTTP/1.1" 404 17568
+Not Found: /api/products/create/
+"PUT /api/products/create/ HTTP/1.1" 404 17566
+Not Found: /
+"GET / HTTP/1.1" 404 3059
+Not Found: /products
+"GET /products HTTP/1.1" 404 3101
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 10099
+Not Found: /api/products/create/
+"GET /api/products/create/ HTTP/1.1" 404 17566
+Not Found: /api/products/create/
+"PUT /api/products/create/ HTTP/1.1" 404 17566
+Not Found: /api/products/create/
+"PATCH /api/products/create/ HTTP/1.1" 404 17568
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /api/blog/reports/
+"GET /api/blog/reports/ HTTP/1.1" 404 15828
+Not Found: /admin/reports
+"GET /admin/reports HTTP/1.1" 404 6967
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
