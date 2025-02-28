@@ -9,8 +9,8 @@ const selectedCategory = ref('')
 const router = useRouter()
 
 const filteredProducts = computed(() => {
-  return products.value.filter(p => {
-    const matchesSearch = searchQuery.value
+  const results = products.value.filter(p => {
+    const matchesSearch = searchQuery.value.trim()
       ? p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
       : true
 
@@ -20,6 +20,10 @@ const filteredProducts = computed(() => {
 
     return matchesSearch && matchesCategory
   })
+
+  console.log('🔍 Produits filtrés:', results.length ? results : 'Aucun produit trouvé')
+
+  return results
 })
 
 onMounted(async () => {
@@ -28,7 +32,7 @@ onMounted(async () => {
     console.log('✅ API Response:', response.data)
     products.value = response.data
   } catch (error) {
-    console.error('Erreur API:', error)
+    console.error('❌ Erreur API:', error)
   }
 })
 
@@ -60,7 +64,8 @@ const viewProduct = (id) => {
       </div>
     </div>
 
-    <div v-if="filteredProducts.length" class="row">
+    <!-- ✅ Vérification si des produits sont trouvés -->
+    <div v-if="filteredProducts.length > 0" class="row">
       <div v-for="product in filteredProducts" :key="product.id" class="col-md-4 mb-4">
         <div class="card">
           <img :src="product.imageUrl" class="card-img-top" :alt="product.name">
@@ -74,11 +79,9 @@ const viewProduct = (id) => {
       </div>
     </div>
 
-    <!-- Ajoute ce bloc pour debug -->
-    <div v-else>
-      <p class="alert alert-warning">Aucun produit trouvé.</p>
-      <pre>{{ filteredProducts }}</pre>
-      <pre>{{ products }}</pre>
+    <!-- ✅ Message si aucun produit trouvé -->
+    <div v-else class="alert alert-warning text-center mt-4">
+      Aucun produit trouvé. Essayez un autre terme !
     </div>
   </div>
 </template>

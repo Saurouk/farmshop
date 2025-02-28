@@ -316,3 +316,15 @@ Not Found: /admin/reports
 "GET /admin/reports HTTP/1.1" 404 6967
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /
+"GET / HTTP/1.1" 404 3059
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3110
