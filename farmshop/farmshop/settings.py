@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'blog',
     'cart',
     'orders',
+    'users',
     'rest_framework.authtoken',
     'django_filters',
 ]

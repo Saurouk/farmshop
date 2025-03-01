@@ -1,11 +1,18 @@
-from django.contrib.auth.models import User
-from rest_framework import generics, status
+from django.contrib.auth import get_user_model
+from rest_framework import generics, status, viewsets, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer
+from .serializers import UserSerializer, MessageSerializer
+from .models import Message
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
+    """
+    API pour l'inscription d'un nouvel utilisateur.
+    Retourne également les tokens JWT à la création du compte.
+    """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
@@ -21,3 +28,41 @@ class RegisterView(generics.CreateAPIView):
                 "access": str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API pour la gestion des utilisateurs.
+    - Un admin peut voir tous les utilisateurs.
+    - Un utilisateur normal peut voir/modifier son propre profil.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:  # ✅ Un admin voit tous les utilisateurs
+            return User.objects.all()
+        return User.objects.filter(id=user.id)  # ✅ Un utilisateur normal ne voit que son propre profil
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """
+    API pour l'envoi et la réception des messages entre utilisateurs.
+    - Un utilisateur ne peut voir que ses propres messages reçus.
+    - Un admin peut voir tous les messages.
+    """
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:  # ✅ Un admin voit tous les messages
+            return Message.objects.all()
+        return Message.objects.filter(recipient=user)  # ✅ Un utilisateur normal ne voit que ses messages reçus
+
+    def perform_create(self, serializer):
+        """
+        Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté.
+        """
+        serializer.save(sender=self.request.user)

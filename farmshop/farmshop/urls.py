@@ -3,10 +3,14 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('products.urls')), # Ajout des routes Pour la liste des produits
-    path('auth/', include('users.urls')),  # Ajout des routes d'authentification
-    path('api/', include('blog.urls')),  # Ajout des routes pour le blog et les commentaires
-    path('api/cart/', include('cart.urls')),  # Ajout des routes pour le panier
-    path('api/orders/', include('orders.urls')), # Ajout des routes pour les commandes
+
+    # ✅ Routes bien organisées sous `api/`
+    path('api/products/', include('products.urls')),  # Produits
+    path('api/blog/', include('blog.urls')),  # Blog & Commentaires
+    path('api/cart/', include('cart.urls')),  # Panier
+    path('api/orders/', include('orders.urls')),  # Commandes
+
+    # ✅ Routes d'authentification et gestion des utilisateurs
+    path('api/users/', include('users.urls')),  # Utilisateurs & Authentification
     path('api-auth/', include('rest_framework.urls')),
 ]
