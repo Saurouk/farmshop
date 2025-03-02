@@ -1,17 +1,19 @@
 <template>
-  <div class="login-container">
-    <h2>🔐 Connexion</h2>
-    <p>Connectez-vous à votre compte FarmShop.</p>
+  <div class="register-container">
+    <h2>📝 Inscription</h2>
+    <p>Créez un compte pour accéder à FarmShop.</p>
 
-    <form @submit.prevent="login">
+    <form @submit.prevent="register">
       <input v-model="username" type="text" placeholder="Nom d'utilisateur" required />
+      <input v-model="email" type="email" placeholder="Email" required />
       <input v-model="password" type="password" placeholder="Mot de passe" required />
-      <button type="submit">Se connecter</button>
+      <button type="submit">Créer mon compte</button>
     </form>
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
-    <p>Pas encore de compte ? <router-link to="/register">Inscrivez-vous</router-link></p>
+    <p>Déjà inscrit ? <router-link to="/login">Connectez-vous</router-link></p>
   </div>
 </template>
 
@@ -21,31 +23,34 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const username = ref('');
+const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
+const successMessage = ref('');
 const router = useRouter();
 
-const login = async () => {
+const register = async () => {
   try {
-    const response = await axios.post('http://127.0.0.1:8000/auth/login/', {
+    await axios.post('http://127.0.0.1:8000/auth/register/', {
       username: username.value,
+      email: email.value,
       password: password.value
     });
 
-    // Stocker les tokens JWT
-    localStorage.setItem('access_token', response.data.access);
-    localStorage.setItem('refresh_token', response.data.refresh);
+    successMessage.value = "Compte créé avec succès ! Redirection...";
 
-    // Rediriger après connexion réussie
-    router.push('/products');
+    // Attendre 2s avant de rediriger vers la connexion
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
   } catch (error) {
-    errorMessage.value = "Nom d'utilisateur ou mot de passe incorrect.";
+    errorMessage.value = "Erreur lors de l'inscription. Vérifiez vos informations.";
   }
 };
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   max-width: 400px;
   margin: 50px auto;
   padding: 20px;
@@ -65,17 +70,21 @@ input {
 button {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   border: none;
   cursor: pointer;
   border-radius: 5px;
 }
 button:hover {
-  background-color: #0056b3;
+  background-color: #218838;
 }
 .error {
   color: red;
+  margin-top: 10px;
+}
+.success {
+  color: green;
   margin-top: 10px;
 }
 </style>

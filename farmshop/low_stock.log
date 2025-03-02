@@ -432,3 +432,23 @@ Not Found: /auth/login/
 "POST /auth/login/ HTTP/1.1" 404 3130
 Not Found: /auth/login/
 "POST /auth/login/ HTTP/1.1" 404 3130
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 3141
+Not Found: /api/categories
+"GET /api/categories HTTP/1.1" 404 3138
+Not Found: /api/rentals
+"GET /api/rentals HTTP/1.1" 404 3129
+Not Found: /api/orders
+"GET /api/orders HTTP/1.1" 404 3126
+Not Found: /api/orders/
+"GET /api/orders/ HTTP/1.1" 404 4711
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 3141
+Not Found: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 404 17591
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
