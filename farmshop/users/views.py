@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status, viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -7,6 +8,14 @@ from .serializers import UserSerializer, MessageSerializer
 from .models import Message
 
 User = get_user_model()
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_current_user(request):
+    """ Retourne les infos de l'utilisateur connecté """
+    user = request.user
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -66,3 +75,5 @@ class MessageViewSet(viewsets.ModelViewSet):
         Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté.
         """
         serializer.save(sender=self.request.user)
+
+

@@ -1,44 +1,72 @@
-<!-- src/components/Navbar.vue -->
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-sm">
-    <div class="container">
-      <router-link class="navbar-brand text-white fw-bold" to="/">
-        🌾 FarmShop
-      </router-link>
+  <nav class="navbar">
+    <router-link to="/">🏠 Accueil</router-link>
+    <router-link to="/products">🛍️ Produits</router-link>
+    <router-link to="/blog">📝 Blog</router-link>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/">Accueil</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/products">Produits</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/blog">Blog</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/contact">Contact</router-link>
-          </li>
-        </ul>
-        <router-link class="btn btn-warning text-dark ms-3 fw-bold" to="/login">Connexion</router-link>
-      </div>
+    <div class="auth-links">
+      <span v-if="isLoggedIn">👤 {{ username }}</span>
+      <router-link v-if="!isLoggedIn" to="/login">🔐 Connexion</router-link>
+      <button v-if="isLoggedIn" @click="logout">🚪 Déconnexion</button>
     </div>
   </nav>
 </template>
 
-<script>
-export default {
-  name: "Navbar"
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+
+const router = useRouter();
+const username = ref(""); // Stocke le nom d'utilisateur
+const isLoggedIn = computed(() => !!localStorage.getItem("access_token"));
+
+// Récupérer les infos du user connecté
+const fetchUser = async () => {
+  try {
+    if (!isLoggedIn.value) return;
+
+    const response = await axios.get("http://127.0.0.1:8000/api/users/me/", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+    });
+    username.value = response.data.username;
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération de l'utilisateur :", error);
+    logout();
+  }
 };
+
+// Se déconnecter
+const logout = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  username.value = "";
+  router.push("/login");
+};
+
+// Charger l'utilisateur connecté au démarrage
+onMounted(fetchUser);
 </script>
 
 <style scoped>
-.nav-link:hover {
-  color: #ffd700 !important; /* Jaune doré au survol */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  background: #007bff;
+  color: white;
+}
+.auth-links {
+  display: flex;
+  gap: 15px;
+}
+button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  text-decoration: underline;
 }
 </style>

@@ -68,6 +68,9 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+AUTH_USER_MODEL = 'users.User'
+
+
 
 LOGGING = {
     'version': 1,

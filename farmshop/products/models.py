@@ -1,4 +1,6 @@
 import logging
+
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -55,7 +57,7 @@ class Product(models.Model):
 
 class Rental(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
     is_active = models.BooleanField(default=True)

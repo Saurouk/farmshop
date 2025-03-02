@@ -9,8 +9,10 @@ urlpatterns = [
     path('api/blog/', include('blog.urls')),  # Blog & Commentaires
     path('api/cart/', include('cart.urls')),  # Panier
     path('api/orders/', include('orders.urls')),  # Commandes
+path('api/users/', include('users.urls')),  # ✅ Accès à `/api/users/`
+
 
     # ✅ Routes d'authentification et gestion des utilisateurs
-    path('api/users/', include('users.urls')),  # Utilisateurs & Authentification
+    path('auth/', include('users.urls')),  # Utilisateurs & Authentification
     path('api-auth/', include('rest_framework.urls')),
 ]
