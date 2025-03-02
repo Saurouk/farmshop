@@ -111,8 +111,8 @@ REST_FRAMEWORK = {
 
 
 'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # Protège toutes les vues par défaut
-        'rest_framework.permissions.AllowAny',
+
+        'rest_framework.permissions.AllowAny', # ✅ Tout le monde peut voir les produits
     ),
 }
 

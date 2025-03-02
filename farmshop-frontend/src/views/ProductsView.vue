@@ -1,7 +1,10 @@
-<script setup>
-import ProductList from '../components/ProductList.vue'
-</script>
-
 <template>
-  <ProductList />
+  <div>
+    <h1>Produits</h1>
+    <ProductList />
+  </div>
 </template>
+
+<script setup>
+import ProductList from '@/components/ProductList.vue';  // ✅ Vérifie l'import
+</script>

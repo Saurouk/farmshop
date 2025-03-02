@@ -7,19 +7,21 @@ from rest_framework.response import Response
 from .models import Product, Rental, Category
 from .serializers import ProductSerializer, RentalSerializer, CategorySerializer
 
+from rest_framework import viewsets, permissions
+from .models import Product
+from .serializers import ProductSerializer
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category__name']
-    search_fields = ['name', 'description']
 
+    # ✅ Permettre à tout le monde de voir les produits
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method in ['GET']:  # Lecture accessible à tous
             return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+        return [permissions.IsAdminUser()]  # Modification réservée aux admins
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()

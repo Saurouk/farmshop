@@ -21,19 +21,18 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const route = useRoute()
-const product = ref(null)
+const route = useRoute();
+const product = ref(null);
 
 onMounted(async () => {
   try {
-    const productId = route.params.id
-    const response = await axios.get(`http://localhost:8000/api/products/${productId}/`)
-    product.value = response.data
-    console.log('✅ Détails du produit récupérés:', product.value)
+    const productId = route.params.id;
+    const response = await axios.get(`http://127.0.0.1:8000/api/products/${productId}/`);
+    product.value = response.data;
   } catch (error) {
-    console.error('❌ Erreur API:', error)
+    console.error('❌ Erreur API:', error);
   }
-})
+});
 </script>
 
 <style scoped>

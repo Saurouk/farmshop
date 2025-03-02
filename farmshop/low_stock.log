@@ -328,3 +328,107 @@ Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3110
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 58
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Not Found: /api/products/{2}
+"GET /api/products/%7B2%7D HTTP/1.1" 404 8468
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Not Found: /api/products/2
+"GET /api/products/2 HTTP/1.1" 404 8458
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Forbidden: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 403 10515
+Forbidden: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 403 10515
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Not Found: /api/products/2
+"GET /api/products/2 HTTP/1.1" 404 8458
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Unauthorized: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 401 10100
+Forbidden: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 403 10515
+Not Found: /api
+"GET /api HTTP/1.1" 404 3105
+Forbidden: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 403 10515
+Unauthorized: /api/products/
+"GET /api/products/ HTTP/1.1" 401 9892
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Unauthorized: /api/products/rentals/
+"GET /api/products/rentals/ HTTP/1.1" 401 10070
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Not Found: /api/products/blogs/blogs
+"GET /api/products/blogs/blogs HTTP/1.1" 404 8488
+Not Found: /api/products/blogs
+"GET /api/products/blogs HTTP/1.1" 404 8470
+Not Found: /api/products/blog
+"GET /api/products/blog HTTP/1.1" 404 8467
+Unauthorized: /api/products/categories/
+"GET /api/products/categories/ HTTP/1.1" 401 10100
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Unauthorized: /api/products/rentals/
+"GET /api/products/rentals/ HTTP/1.1" 401 10070
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
