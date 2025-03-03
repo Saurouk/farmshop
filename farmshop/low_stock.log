@@ -492,3 +492,55 @@ Not Found: /api/users
 "GET /api/users HTTP/1.1" 404 3118
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3124
+Unauthorized: /api/users/me/
+"GET /api/users/me/ HTTP/1.1" 401 10037
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
+Method Not Allowed: /auth/login/
+"GET /auth/login/ HTTP/1.1" 405 12548
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3277
+Method Not Allowed: /auth/login/
+"GET /auth/login/ HTTP/1.1" 405 12548
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3277
+Not Found: /
+"GET / HTTP/1.1" 404 3078
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3129
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
+Not Found: /auth/login/
+"POST /auth/login/ HTTP/1.1" 404 3130
+Method Not Allowed: /auth/login/
+"GET /auth/login/ HTTP/1.1" 405 12450
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Not Found: /auth/register/
+"GET /auth/register/ HTTP/1.1" 404 3502
+Not Found: /auth/register/
+"GET /auth/register/ HTTP/1.1" 404 3502
+Not Found: /
+"GET / HTTP/1.1" 404 3437
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3488
+Not Found: /api/auth
+"GET /api/auth HTTP/1.1" 404 3479
+Not Found: /api/register
+"GET /api/register HTTP/1.1" 404 3491
+Not Found: /register
+"GET /register HTTP/1.1" 404 3479
+Not Found: /api/auth/register
+"GET /api/auth/register HTTP/1.1" 404 3506
+Not Found: /api/auth/register
+"GET /api/auth/register HTTP/1.1" 404 3506
+Not Found: /api/auth/register
+"GET /api/auth/register HTTP/1.1" 404 3506
+Method Not Allowed: /auth/register/
+"GET /auth/register/ HTTP/1.1" 405 13174
+Method Not Allowed: /auth/login/
+"GET /auth/login/ HTTP/1.1" 405 12549
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3488

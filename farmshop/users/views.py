@@ -1,9 +1,11 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView  # ✅ Vérifie cet import !
+
 from .serializers import UserSerializer, MessageSerializer
 from .models import Message
 
@@ -50,9 +52,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_staff:  # ✅ Un admin voit tous les utilisateurs
+        if user.is_staff:
             return User.objects.all()
-        return User.objects.filter(id=user.id)  # ✅ Un utilisateur normal ne voit que son propre profil
+        return User.objects.filter(id=user.id)
 
 class MessageViewSet(viewsets.ModelViewSet):
     """
@@ -66,14 +68,36 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_staff:  # ✅ Un admin voit tous les messages
+        if user.is_staff:
             return Message.objects.all()
-        return Message.objects.filter(recipient=user)  # ✅ Un utilisateur normal ne voit que ses messages reçus
+        return Message.objects.filter(recipient=user)
 
     def perform_create(self, serializer):
-        """
-        Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté.
-        """
         serializer.save(sender=self.request.user)
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    ✅ Surcharge la connexion pour inclure les infos utilisateur
+    ✅ Corrige une potentielle erreur si `authenticate()` retourne None
+    """
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        # ✅ Vérifier si username et password sont fournis
+        if not username or not password:
+            return Response({"error": "Identifiants manquants."}, status=400)
+
+        # ✅ Authentifier l'utilisateur
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            response.data["user"] = UserSerializer(user).data
+        else:
+            return Response({"error": "Nom d'utilisateur ou mot de passe incorrect."}, status=401)
+
+        return response

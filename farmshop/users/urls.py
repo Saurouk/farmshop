@@ -3,18 +3,15 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import RegisterView, UserViewSet, MessageViewSet, get_current_user
 
-# ✅ Définition correcte du router pour `/api/users/`
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')  # ✅ Accès à `/api/users/`
-router.register(r'messages', MessageViewSet, basename='message')  # ✅ Accès à `/api/users/messages/`
+router.register(r'', UserViewSet, basename='user')
+router.register(r'messages', MessageViewSet, basename='message')
 
 urlpatterns = [
-    # ✅ Routes pour l'inscription et la connexion
+    # ✅ Route d'inscription (elle doit être bien là)
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', TokenObtainPairView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('me/', get_current_user, name='get_current_user'),  # ✅ Récupère l'utilisateur connecté
-
-    # ✅ Routes dynamiques des utilisateurs/messages (gérées par `DefaultRouter`)
+    path('me/', get_current_user, name='get_current_user'),
     path('', include(router.urls)),
 ]
