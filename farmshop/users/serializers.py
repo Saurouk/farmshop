@@ -7,15 +7,16 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=False, allow_null=True)
     admin_contact = serializers.SerializerMethodField()
-    password = serializers.CharField(write_only=True, required=False)
+    inbox = serializers.SerializerMethodField()  # ✅ Ajout de la boîte de réception
+    password = serializers.CharField(write_only=True, required=False)  # ✅ Conserver la gestion du mot de passe
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'profile_picture', 'admin_contact']
+        fields = ['id', 'username', 'email', 'password', 'profile_picture', 'admin_contact', 'inbox']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        """ Crée un utilisateur avec un mot de passe sécurisé """
+        """ ✅ Crée un utilisateur avec un mot de passe sécurisé """
         password = validated_data.pop('password', None)
         user = User(**validated_data)
         if password:
@@ -24,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        """ Mise à jour du profil utilisateur (incluant le mot de passe et la photo) """
+        """ ✅ Mise à jour du profil utilisateur (mot de passe & photo) """
         password = validated_data.pop('password', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -34,11 +35,16 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     def get_admin_contact(self, obj):
-        """ Récupère les informations de contact de l'admin """
+        """ ✅ Récupère les informations de contact de l'admin """
         admin = User.objects.filter(is_staff=True).first()
         if admin:
             return {"username": admin.username, "email": admin.email}
         return None
+
+    def get_inbox(self, obj):
+        """ ✅ Récupère la boîte de réception de l'utilisateur """
+        messages = Message.objects.filter(recipient=obj).order_by('-created_at')
+        return MessageSerializer(messages, many=True).data
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.SlugRelatedField(slug_field='username', read_only=True)

@@ -3,8 +3,9 @@ from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView  # ✅ Vérifie cet import !
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserSerializer, MessageSerializer
 from .models import Message
@@ -14,7 +15,7 @@ User = get_user_model()
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_current_user(request):
-    """ Retourne les infos de l'utilisateur connecté """
+    """ Retourne les infos de l'utilisateur connecté avec sa boîte de réception """
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
@@ -44,11 +45,12 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API pour la gestion des utilisateurs.
     - Un admin peut voir tous les utilisateurs.
-    - Un utilisateur normal peut voir/modifier son propre profil.
+    - Un utilisateur normal peut voir/modifier son propre profil et envoyer des messages.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)  # ✅ Permet d'envoyer des fichiers (images)
 
     def get_queryset(self):
         user = self.request.user
@@ -59,22 +61,18 @@ class UserViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     """
     API pour l'envoi et la réception des messages entre utilisateurs.
-    - Un utilisateur ne peut voir que ses propres messages reçus.
-    - Un admin peut voir tous les messages.
     """
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return Message.objects.all()
-        return Message.objects.filter(recipient=user)
+        """ Un utilisateur voit uniquement ses messages reçus """
+        return Message.objects.filter(recipient=self.request.user).order_by('-created_at')
 
     def perform_create(self, serializer):
+        """ Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté. """
         serializer.save(sender=self.request.user)
-
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """

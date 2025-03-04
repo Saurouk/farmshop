@@ -556,3 +556,19 @@ Not Found: /api/auth/users/me
 "GET /api/auth/users/me HTTP/1.1" 404 3506
 Not Found: /api/auth
 "GET /api/auth HTTP/1.1" 404 3479
+Not Found: /api/auth/users/me
+"GET /api/auth/users/me HTTP/1.1" 404 3511
+Unauthorized: /api/users/me/
+"GET /api/users/me/ HTTP/1.1" 401 10038
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Not Found: /profile_pics/sekiro_2788033b.jpg
+"GET /profile_pics/sekiro_2788033b.jpg HTTP/1.1" 404 3556
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
+Not Found: /profile_pics/sekiro_2788033b.jpg
+"GET /profile_pics/sekiro_2788033b.jpg HTTP/1.1" 404 3556
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63

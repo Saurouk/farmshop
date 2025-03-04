@@ -5,7 +5,7 @@ import ProductDetailView from '../views/ProductDetailView.vue'
 import BlogView from '../views/BlogView.vue'
 import ContactView from '../views/ContactView.vue'
 import LoginView from '../views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue';
+import RegisterView from '@/views/RegisterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,9 +17,9 @@ const router = createRouter({
     { path: '/contact', component: ContactView },
     { path: '/login', component: LoginView },
     { path: '/register', component: RegisterView },
+    { path: '/inbox', name: 'Inbox', component: () => import('@/views/InboxView.vue'), meta: { requiresAuth: true } }, // ✅ Ajout de la virgule ici
 
-
-  {
+    {  // ✅ Correction de la route `/profile`
       path: '/profile',
       name: 'UserProfile',
       component: () => import('@/views/UserProfileView.vue'),

@@ -13,5 +13,6 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', get_current_user, name='get_current_user'),
+    path('messages/', MessageViewSet.as_view({'get': 'list'}), name='user-messages'),
     path('', include(router.urls)),
 ]
