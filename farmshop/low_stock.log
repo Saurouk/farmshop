@@ -544,3 +544,15 @@ Method Not Allowed: /auth/login/
 "GET /auth/login/ HTTP/1.1" 405 12549
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3488
+Not Found: /
+"GET / HTTP/1.1" 404 3437
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3488
+Not Found: /api/users/me
+"GET /api/users/me HTTP/1.1" 404 3491
+Not Found: /api/users
+"GET /api/users HTTP/1.1" 404 3482
+Not Found: /api/auth/users/me
+"GET /api/auth/users/me HTTP/1.1" 404 3506
+Not Found: /api/auth
+"GET /api/auth HTTP/1.1" 404 3479

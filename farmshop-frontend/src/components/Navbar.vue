@@ -25,11 +25,17 @@
           </li>
         </ul>
 
-        <div v-if="auth.state.isAuthenticated" class="user-menu">
+        <div v-if="auth.state.isAuthenticated" class="user-menu d-flex align-items-center">
+          <router-link class="btn btn-primary me-3" to="/profile">
+            👤 Mon Profil
+          </router-link>
           <span class="text-white fw-bold">👤 {{ auth.state.username }}</span>
           <button @click="logout" class="btn btn-danger ms-3 fw-bold">Déconnexion</button>
         </div>
-        <router-link v-else class="btn btn-warning text-dark ms-3 fw-bold" to="/login">Connexion</router-link>
+
+        <router-link v-else class="btn btn-warning text-dark ms-3 fw-bold" to="/login">
+          Connexion
+        </router-link>
       </div>
     </div>
   </nav>
@@ -46,3 +52,10 @@ const logout = () => {
   router.push("/");
 };
 </script>
+
+<style scoped>
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+</style>

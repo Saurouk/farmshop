@@ -16,7 +16,7 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # ✅ Ajout de l'authentification et des utilisateurs
-    path('auth/', include('users.urls')),  # <- Vérifie que cette ligne existe
+    path('api/users/', include('users.urls')),  # ✅ Correct ! Accessible sous /api/users/
 
     # API Django REST Framework (authentification basique)
     path('api-auth/', include('rest_framework.urls')),
