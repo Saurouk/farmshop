@@ -572,3 +572,245 @@ Not Found: /profile_pics/sekiro_2788033b.jpg
 "GET /profile_pics/sekiro_2788033b.jpg HTTP/1.1" 404 3556
 Unauthorized: /auth/login/
 "POST /auth/login/ HTTP/1.1" 401 63
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Not Found: /profile_pics/sekiro_2788033b.jpg
+"GET /profile_pics/sekiro_2788033b.jpg HTTP/1.1" 404 3556
+Not Found: /
+"GET / HTTP/1.1" 404 3442
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Unauthorized: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 401 10088
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Unauthorized: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 401 10088
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16071
+Unauthorized: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 401 10088
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Unauthorized: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 401 10088
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /api/users/dashboard/
+"GET /api/users/dashboard/ HTTP/1.1" 404 16070
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 37, in admin_dashboard
+    blog_count = BlogPost.objects.count()  # Nombre total d'articles de blog
+                 ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 100194
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 37, in admin_dashboard
+    blog_count = BlogPost.objects.count()  # Nombre total d'articles de blog
+                 ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 100194
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 38, in admin_dashboard
+    "total_blog_posts": BlogPost.objects.count(),  # Nombre total d'articles de blog
+                        ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 99887
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 38, in admin_dashboard
+    "total_blog_posts": BlogPost.objects.count(),  # Nombre total d'articles de blog
+                        ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 99887
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 38, in admin_dashboard
+    "total_blog_posts": BlogPost.objects.count(),  # Nombre total d'articles de blog
+                        ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 99893
+Internal Server Error: /api/users/dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\venv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\users\views.py", line 38, in admin_dashboard
+    "total_blog_posts": BlogPost.objects.count(),  # Nombre total d'articles de blog
+                        ^^^^^^^^
+NameError: name 'BlogPost' is not defined
+"GET /api/users/dashboard/ HTTP/1.1" 500 99893
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493

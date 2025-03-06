@@ -8,6 +8,7 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Date de création
     updated_at = models.DateTimeField(auto_now=True)  # Date de mise à jour
     is_published = models.BooleanField(default=True)  # ✅ Article publié ou non
+    is_reported = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

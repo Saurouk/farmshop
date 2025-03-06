@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Article, Comment, Report
 from .serializers import ArticleSerializer, CommentSerializer, ReportSerializer
+
 
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all().order_by('-created_at')
@@ -23,6 +23,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """ Lorsqu'un article est créé, l'auteur est automatiquement l'utilisateur connecté. """
         serializer.save(author=self.request.user)  # ✅ Assigner automatiquement l'auteur
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
@@ -54,6 +55,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """ Lorsqu'un commentaire est créé, l'utilisateur connecté est automatiquement défini comme auteur. """
         serializer.save(user=self.request.user)
+
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all().order_by('-created_at')

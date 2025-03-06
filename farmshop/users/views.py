@@ -7,10 +7,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import UserSerializer, MessageSerializer
+from .serializers import UserSerializer, MessageSerializer, AdminDashboardSerializer
 from .models import Message
+from products.models import Product
+from blog.models import Article, Comment
 
 User = get_user_model()
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -19,6 +22,24 @@ def get_current_user(request):
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_dashboard(request):
+    """ ✅ Retourne les statistiques pour l'admin """
+    if not request.user.is_staff:
+        return Response({"error": "Accès refusé. Vous n'êtes pas admin."}, status=403)
+
+    stats = {
+        "total_users": User.objects.count(),  # Nombre total d'utilisateurs
+        "total_products": Product.objects.count(),  # Nombre total de produits
+        "total_blog_posts": Article.objects.count(),  # ✅ Correction ici : Article au lieu de BlogPost
+        "reported_comments": Comment.objects.filter(report__resolved=False).count(),  # Nombre de signalements non résolus
+    }
+
+    return Response(stats, status=200)  # ✅ Retourne les stats avec un statut HTTP 200
+
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -41,6 +62,7 @@ class RegisterView(generics.CreateAPIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API pour la gestion des utilisateurs.
@@ -50,13 +72,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)  # ✅ Permet d'envoyer des fichiers (images)
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:
             return User.objects.all()
         return User.objects.filter(id=user.id)
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     """
@@ -74,6 +97,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """ Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté. """
         serializer.save(sender=self.request.user)
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     ✅ Surcharge la connexion pour inclure les infos utilisateur
@@ -86,11 +110,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         username = request.data.get("username")
         password = request.data.get("password")
 
-        # ✅ Vérifier si username et password sont fournis
         if not username or not password:
             return Response({"error": "Identifiants manquants."}, status=400)
 
-        # ✅ Authentifier l'utilisateur
         user = authenticate(username=username, password=password)
 
         if user is not None:

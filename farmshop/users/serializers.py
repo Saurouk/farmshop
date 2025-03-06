@@ -54,3 +54,10 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'sender', 'recipient', 'content', 'is_read', 'created_at']
         read_only_fields = ['id', 'sender', 'created_at']
+
+
+class AdminDashboardSerializer(serializers.Serializer):
+    total_users = serializers.IntegerField()
+    total_products = serializers.IntegerField()
+    total_articles = serializers.IntegerField()
+    total_reports = serializers.IntegerField()

@@ -15,8 +15,8 @@ urlpatterns = [
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    # ✅ Ajout de l'authentification et des utilisateurs
-    path('api/users/', include('users.urls')),  # ✅ Correct ! Accessible sous /api/users/
+    # ✅ Vérifie que l'URL `/api/users/` est bien enregistrée
+    path('api/users/', include('users.urls')),
 
     # API Django REST Framework (authentification basique)
     path('api-auth/', include('rest_framework.urls')),
