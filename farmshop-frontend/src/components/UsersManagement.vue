@@ -63,12 +63,23 @@ const newUser = ref({
 // 🔄 Récupérer les utilisateurs depuis l'API Django
 const fetchUsers = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/users/");
+    const token = localStorage.getItem("access_token"); // ✅ Récupère le token JWT
+    if (!token) {
+      console.error("❌ Aucun token trouvé. L'utilisateur doit être authentifié.");
+      return;
+    }
+
+    const response = await axios.get("http://127.0.0.1:8000/api/users/", {
+      headers: { Authorization: `Bearer ${token}` } // ✅ Ajoute le token JWT
+    });
+
     users.value = response.data;
+    console.log("✅ Liste des utilisateurs récupérée :", users.value);
   } catch (error) {
-    console.error("Erreur lors de la récupération des utilisateurs:", error);
+    console.error("❌ Erreur lors de la récupération des utilisateurs:", error);
   }
 };
+
 
 // 🔹 Ouvrir le modal pour Ajouter / Modifier un utilisateur
 const openModal = (user = null) => {

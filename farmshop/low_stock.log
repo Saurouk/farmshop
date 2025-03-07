@@ -858,3 +858,17 @@ Not Found: /
 "GET / HTTP/1.1" 404 3442
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3493
+Not Found: /
+"GET / HTTP/1.1" 404 3442
+Not Found: /api/token
+"GET /api/token HTTP/1.1" 404 3487
+Unauthorized: /api/users/me/
+"GET /api/users/me/ HTTP/1.1" 401 10038
+Unauthorized: /api/users/
+"GET /api/users/ HTTP/1.1" 401 58
+Not Found: /profile_pics/sekiro_2788033b.jpg
+"GET /profile_pics/sekiro_2788033b.jpg HTTP/1.1" 404 3556
+Unauthorized: /api/users/
+"GET /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"GET /api/users/ HTTP/1.1" 401 58
