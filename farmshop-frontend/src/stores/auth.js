@@ -1,35 +1,78 @@
-import { reactive, computed } from "vue";
-import auth from "@/stores/auth";  // ✅ Chemin mis à jour
+// auth.js
+import { reactive, computed } from 'vue';
+import axios from 'axios';
 
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Assure-toi que cette URL est correcte
 
-// ✅ Initialiser l'état à partir du localStorage
 const state = reactive({
-  username: localStorage.getItem("username") || null,  // ✅ Charge l'utilisateur stocké
-  isAuthenticated: !!localStorage.getItem("access_token"),
+  username: localStorage.getItem('username') || null,
+  isAuthenticated: !!localStorage.getItem('access_token'),
+  isAdmin: localStorage.getItem('isAdmin') === 'true'
 });
 
-// ✅ Met à jour l'utilisateur après connexion
+// 🔹  `isAdmin` est bien mis à jour après le chargement de l'état
+const updateAdminStatus = () => {
+  state.isAdmin = localStorage.getItem('isAdmin') === 'true';
+};
+
+// 🔹 Fonction pour récupérer l'utilisateur connecté
+const fetchCurrentUser = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/me/`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+    });
+
+    const user = response.data;
+    console.log("🔄 Utilisateur connecté:", user); // Debug
+
+    state.username = user.username;
+    state.isAuthenticated = true;
+    state.isAdmin = user.is_staff === true;
+
+    localStorage.setItem("username", user.username);
+    localStorage.setItem("isAdmin", state.isAdmin ? "true" : "false");
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération de l'utilisateur:", error);
+  }
+};
+
+// 🔹 Fonction pour mettre à jour l'état de l'utilisateur
 const setUser = (user) => {
+  console.log("🔄 Utilisateur reçu:", user); // Debug
+
   state.username = user.username;
   state.isAuthenticated = true;
-  localStorage.setItem("username", user.username);  // ✅ Stocke le nom de l'utilisateur
+  state.isAdmin = user.is_staff === true;
+
+  localStorage.setItem("username", user.username);
+  localStorage.setItem("isAdmin", state.isAdmin ? "true" : "false");
+
+  updateAdminStatus(); // ✅ Mise à jour immédiate de `isAdmin`
 };
 
-// ✅ Déconnexion
+// 🔹 Fonction de déconnexion
 const logoutUser = () => {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
-  localStorage.removeItem("username");  // ✅ Supprime le username stocké
+  localStorage.clear();
   state.username = null;
   state.isAuthenticated = false;
+  state.isAdmin = false;
 };
 
-// ✅ Récupérer l'état d'authentification sous forme de computed property
+// 🔹 Vérifier si `isAdmin` est bien récupéré après un refresh
+if (state.isAuthenticated) {
+  fetchCurrentUser();
+}
+
+// 🔹 Propriétés calculées
 const isLoggedIn = computed(() => state.isAuthenticated);
+const isAdmin = computed(() => state.isAdmin);
 
 export default {
   state,
+  fetchCurrentUser,
   setUser,
   logoutUser,
-  isLoggedIn,  // ✅ Ajout pour pouvoir l'utiliser facilement dans la navbar
+  isLoggedIn,
+  isAdmin,
+  updateAdminStatus
 };

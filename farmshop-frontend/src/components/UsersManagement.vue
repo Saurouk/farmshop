@@ -1,21 +1,16 @@
 <template>
   <div class="users-management">
-    <h2>Gestion des Utilisateurs</h2>
+    <h2>👥 Gestion des Utilisateurs</h2>
+    <button @click="openModal()" class="btn btn-success">➕ Ajouter un utilisateur</button>
 
-    <!-- Message de chargement -->
-    <div v-if="loading">Chargement des utilisateurs...</div>
-
-    <!-- Message d'erreur -->
-    <div v-if="error" class="error">{{ error }}</div>
-
-    <!-- Tableau des utilisateurs -->
-    <table v-if="users.length > 0">
+    <table class="table table-striped mt-4">
       <thead>
         <tr>
           <th>ID</th>
           <th>Nom d'utilisateur</th>
           <th>Email</th>
-          <th>Action</th>
+          <th>Admin</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -23,92 +18,125 @@
           <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
+          <td>{{ user.is_staff ? "✅" : "❌" }}</td>
           <td>
-            <button @click="deleteUser(user.id)">Supprimer</button>
+            <button @click="openModal(user)" class="btn btn-warning btn-sm">✏️ Modifier</button>
+            <button @click="deleteUser(user.id)" class="btn btn-danger btn-sm">🗑 Supprimer</button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div v-else-if="!loading && users.length === 0">Aucun utilisateur trouvé.</div>
+    <!-- MODAL AJOUT / MODIFICATION UTILISATEUR -->
+    <div v-if="showModal" class="modal">
+      <div class="modal-content">
+        <h3>{{ editingUser ? "Modifier" : "Ajouter" }} un utilisateur</h3>
+        <input type="text" v-model="newUser.username" placeholder="Nom d'utilisateur" required />
+        <input type="email" v-model="newUser.email" placeholder="Email" required />
+        <input type="password" v-model="newUser.password" placeholder="Mot de passe (laisser vide si inchangé)" />
+        <label>
+          <input type="checkbox" v-model="newUser.is_staff" />
+          Administrateur
+        </label>
+        <button @click="saveUser" class="btn btn-primary">💾 Enregistrer</button>
+        <button @click="closeModal" class="btn btn-secondary">❌ Annuler</button>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue";
 import axios from "axios";
 
-export default {
-  data() {
-    return {
-      users: [],
-      loading: false,
-      error: null,
-    };
-  },
-  mounted() {
-    this.fetchUsers();
-  },
-  methods: {
-    async fetchUsers() {
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await axios.get("http://localhost:8000/api/users/", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        this.users = response.data;
-      } catch (err) {
-        this.error = "Erreur lors du chargement des utilisateurs.";
-      } finally {
-        this.loading = false;
-      }
-    },
-    async deleteUser(userId) {
-      if (!confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
-      try {
-        await axios.delete(`http://localhost:8000/api/users/${userId}/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        this.users = this.users.filter(user => user.id !== userId);
-      } catch (err) {
-        this.error = "Impossible de supprimer l'utilisateur.";
-      }
-    },
-  },
+const users = ref([]);
+const showModal = ref(false);
+const editingUser = ref(null);
+
+const newUser = ref({
+  username: "",
+  email: "",
+  password: "",
+  is_staff: false,
+});
+
+// 🔄 Récupérer les utilisateurs depuis l'API Django
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/api/users/");
+    users.value = response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs:", error);
+  }
 };
+
+// 🔹 Ouvrir le modal pour Ajouter / Modifier un utilisateur
+const openModal = (user = null) => {
+  if (user) {
+    editingUser.value = user;
+    newUser.value = { ...user, password: "" }; // Ne pas pré-remplir le mot de passe
+  } else {
+    editingUser.value = null;
+    newUser.value = { username: "", email: "", password: "", is_staff: false };
+  }
+  showModal.value = true;
+};
+
+// 🔹 Sauvegarder (ajouter ou modifier) un utilisateur
+const saveUser = async () => {
+  try {
+    if (editingUser.value) {
+      await axios.put(`http://127.0.0.1:8000/api/users/${editingUser.value.id}/`, newUser.value);
+    } else {
+      await axios.post("http://127.0.0.1:8000/api/users/", newUser.value);
+    }
+    closeModal();
+    fetchUsers(); // Actualiser la liste des utilisateurs
+  } catch (error) {
+    console.error("Erreur lors de l'enregistrement:", error);
+  }
+};
+
+// 🔹 Supprimer un utilisateur
+const deleteUser = async (userId) => {
+  if (!confirm("Supprimer cet utilisateur ?")) return;
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/users/${userId}/`);
+    fetchUsers(); // Actualiser la liste
+  } catch (error) {
+    console.error("Erreur lors de la suppression:", error);
+  }
+};
+
+// 🔄 Fermer le modal
+const closeModal = () => {
+  showModal.value = false;
+  editingUser.value = null;
+};
+
+onMounted(fetchUsers);
 </script>
 
 <style scoped>
-.users-management {
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
-}
-table {
+.table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 20px;
 }
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-th {
-  background-color: #f4f4f4;
-}
-button {
-  background-color: red;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: darkred;
-}
-.error {
-  color: red;
-  margin-top: 10px;
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
 }
 </style>
