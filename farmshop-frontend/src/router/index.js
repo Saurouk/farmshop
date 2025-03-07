@@ -17,13 +17,20 @@ const router = createRouter({
     { path: '/contact', component: ContactView },
     { path: '/login', component: LoginView },
     { path: '/register', component: RegisterView },
-    { path: '/inbox', name: 'Inbox', component: () => import('@/views/InboxView.vue'), meta: { requiresAuth: true } }, // ✅ Ajout de la virgule ici
+    { path: '/inbox', name: 'Inbox', component: () => import('@/views/InboxView.vue'), meta: { requiresAuth: true } },
 
-    {  // ✅ Correction de la route `/profile`
+    {
       path: '/profile',
       name: 'UserProfile',
       component: () => import('@/views/UserProfileView.vue'),
       meta: { requiresAuth: true }
+    },
+
+    {
+      path: '/admin/users',
+      name: 'UsersManagement',
+      component: () => import('@/components/UsersManagement.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })

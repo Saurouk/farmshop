@@ -814,3 +814,5 @@ NameError: name 'BlogPost' is not defined
 "GET /api/users/dashboard/ HTTP/1.1" 500 99893
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 3493
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3493

@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -25,6 +25,27 @@ def get_current_user(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
+def list_users(request):
+    """ ✅ Endpoint pour voir tous les utilisateurs (admin uniquement) """
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_user(request, user_id):
+    """ ✅ Endpoint pour supprimer un utilisateur (admin uniquement) """
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return Response({"message": "Utilisateur supprimé avec succès."}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "Utilisateur non trouvé."}, status=404)
+
+
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_dashboard(request):
     """ ✅ Retourne les statistiques pour l'admin """
@@ -32,13 +53,13 @@ def admin_dashboard(request):
         return Response({"error": "Accès refusé. Vous n'êtes pas admin."}, status=403)
 
     stats = {
-        "total_users": User.objects.count(),  # Nombre total d'utilisateurs
-        "total_products": Product.objects.count(),  # Nombre total de produits
-        "total_blog_posts": Article.objects.count(),  # ✅ Correction ici : Article au lieu de BlogPost
-        "reported_comments": Comment.objects.filter(report__resolved=False).count(),  # Nombre de signalements non résolus
+        "total_users": User.objects.count(),
+        "total_products": Product.objects.count(),
+        "total_blog_posts": Article.objects.count(),
+        "reported_comments": Comment.objects.filter(report__resolved=False).count(),
     }
 
-    return Response(stats, status=200)  # ✅ Retourne les stats avec un statut HTTP 200
+    return Response(stats, status=200)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -66,8 +87,6 @@ class RegisterView(generics.CreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     """
     API pour la gestion des utilisateurs.
-    - Un admin peut voir tous les utilisateurs.
-    - Un utilisateur normal peut voir/modifier son propre profil et envoyer des messages.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -90,18 +109,15 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """ Un utilisateur voit uniquement ses messages reçus """
         return Message.objects.filter(recipient=self.request.user).order_by('-created_at')
 
     def perform_create(self, serializer):
-        """ Lorsqu'un message est envoyé, l'expéditeur est automatiquement défini comme l'utilisateur connecté. """
         serializer.save(sender=self.request.user)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     ✅ Surcharge la connexion pour inclure les infos utilisateur
-    ✅ Corrige une potentielle erreur si `authenticate()` retourne None
     """
 
     def post(self, request, *args, **kwargs):
