@@ -49,6 +49,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
+const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ URL de l'API
 const users = ref([]);
 const showModal = ref(false);
 const editingUser = ref(null);
@@ -63,14 +64,14 @@ const newUser = ref({
 // 🔄 Récupérer les utilisateurs depuis l'API Django
 const fetchUsers = async () => {
   try {
-    const token = localStorage.getItem("access_token"); // ✅ Récupère le token JWT
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      console.error("❌ Aucun token trouvé. L'utilisateur doit être authentifié.");
+      console.error("❌ Aucun token trouvé.");
       return;
     }
 
-    const response = await axios.get("http://127.0.0.1:8000/api/users/", {
-      headers: { Authorization: `Bearer ${token}` } // ✅ Ajoute le token JWT
+    const response = await axios.get(`${API_BASE_URL}/users/`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     users.value = response.data;
@@ -80,12 +81,11 @@ const fetchUsers = async () => {
   }
 };
 
-
 // 🔹 Ouvrir le modal pour Ajouter / Modifier un utilisateur
 const openModal = (user = null) => {
   if (user) {
     editingUser.value = user;
-    newUser.value = { ...user, password: "" }; // Ne pas pré-remplir le mot de passe
+    newUser.value = { ...user, password: "" }; // ✅ Ne pas pré-remplir le mot de passe
   } else {
     editingUser.value = null;
     newUser.value = { username: "", email: "", password: "", is_staff: false };
@@ -96,26 +96,67 @@ const openModal = (user = null) => {
 // 🔹 Sauvegarder (ajouter ou modifier) un utilisateur
 const saveUser = async () => {
   try {
-    if (editingUser.value) {
-      await axios.put(`http://127.0.0.1:8000/api/users/${editingUser.value.id}/`, newUser.value);
-    } else {
-      await axios.post("http://127.0.0.1:8000/api/users/", newUser.value);
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      console.error("❌ Aucun token trouvé.");
+      return;
     }
+
+    console.log("🔄 Données envoyées :", newUser.value);
+
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      }
+    };
+
+    if (editingUser.value) {
+      // 🔄 Modification d'un utilisateur
+      console.log(`✏️ Modification de l'utilisateur ID: ${editingUser.value.id}`);
+      await axios.put(
+        `${API_BASE_URL}/users/${editingUser.value.id}/`,
+        newUser.value,  // ✅ Pas besoin de `JSON.stringify()`
+        config
+      );
+    } else {
+      // ➕ Ajout d'un utilisateur
+      console.log("➕ Ajout d'un nouvel utilisateur");
+      await axios.post(
+        `${API_BASE_URL}/users/`,
+        newUser.value,  // ✅ Pas besoin de `JSON.stringify()`
+        config
+      );
+    }
+
+    console.log("✅ Réponse de l'API : Utilisateur ajouté/modifié avec succès");
+
     closeModal();
-    fetchUsers(); // Actualiser la liste des utilisateurs
+    await fetchUsers(); // 🔄 Attendre la mise à jour des utilisateurs après l'ajout/modification
   } catch (error) {
-    console.error("Erreur lors de l'enregistrement:", error);
+    console.error("❌ Erreur lors de l'enregistrement:", error.response ? error.response.data : error);
   }
 };
 
 // 🔹 Supprimer un utilisateur
 const deleteUser = async (userId) => {
-  if (!confirm("Supprimer cet utilisateur ?")) return;
+  if (!confirm("❌ Supprimer cet utilisateur ?")) return;
+
   try {
-    await axios.delete(`http://127.0.0.1:8000/api/users/${userId}/`);
-    fetchUsers(); // Actualiser la liste
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      console.error("❌ Aucun token trouvé.");
+      return;
+    }
+
+    console.log("🗑 Suppression de l'utilisateur ID:", userId);
+    await axios.delete(`${API_BASE_URL}/users/${userId}/`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    await fetchUsers(); // 🔄 Attendre la mise à jour après suppression
   } catch (error) {
-    console.error("Erreur lors de la suppression:", error);
+    console.error("❌ Erreur lors de la suppression:", error);
   }
 };
 

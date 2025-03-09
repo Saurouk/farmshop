@@ -872,3 +872,45 @@ Unauthorized: /api/users/
 "GET /api/users/ HTTP/1.1" 401 58
 Unauthorized: /api/users/
 "GET /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"GET /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unauthorized: /api/users/5/
+"DELETE /api/users/5/ HTTP/1.1" 401 58
+Unauthorized: /api/users/
+"POST /api/users/ HTTP/1.1" 401 58
+Unsupported Media Type: /api/users/
+"POST /api/users/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/
+"POST /api/users/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 415 68
+Unsupported Media Type: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 415 68
+Bad Request: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 400 45
+Bad Request: /api/users/4/
+"PUT /api/users/4/ HTTP/1.1" 400 45

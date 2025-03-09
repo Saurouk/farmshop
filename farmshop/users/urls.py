@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import RegisterView, UserViewSet, MessageViewSet, get_current_user, admin_dashboard
 
 router = DefaultRouter()
-router.register(r'', UserViewSet, basename='user')  # ✅ Assure-toi que cette ligne est bien là
+router.register(r'', UserViewSet, basename='user')
 router.register(r'messages', MessageViewSet, basename='message')
 
 urlpatterns = [

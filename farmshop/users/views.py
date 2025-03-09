@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import generics, status, viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -18,7 +18,7 @@ User = get_user_model()
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_current_user(request):
-    """ Retourne les infos de l'utilisateur connecté avec sa boîte de réception """
+    """Retourne les infos de l'utilisateur connecté"""
     user = request.user
     serializer = UserSerializer(user)
     return Response(serializer.data)
@@ -27,7 +27,7 @@ def get_current_user(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def list_users(request):
-    """ ✅ Endpoint pour voir tous les utilisateurs (admin uniquement) """
+    """Voir tous les utilisateurs (admin uniquement)"""
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
@@ -36,7 +36,7 @@ def list_users(request):
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def delete_user(request, user_id):
-    """ ✅ Endpoint pour supprimer un utilisateur (admin uniquement) """
+    """Supprimer un utilisateur (admin uniquement)"""
     try:
         user = User.objects.get(id=user_id)
         user.delete()
@@ -45,10 +45,37 @@ def delete_user(request, user_id):
         return Response({"error": "Utilisateur non trouvé."}, status=404)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def update_user(request, user_id):
+    """Modifier un utilisateur (admin uniquement)"""
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "Utilisateur non trouvé."}, status=404)
+
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def create_user(request):
+    """Créer un utilisateur (admin uniquement)"""
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUser])
 def admin_dashboard(request):
-    """ ✅ Retourne les statistiques pour l'admin """
+    """Retourne les statistiques pour l'admin"""
     if not request.user.is_staff:
         return Response({"error": "Accès refusé. Vous n'êtes pas admin."}, status=403)
 
@@ -63,10 +90,7 @@ def admin_dashboard(request):
 
 
 class RegisterView(generics.CreateAPIView):
-    """
-    API pour l'inscription d'un nouvel utilisateur.
-    Retourne également les tokens JWT à la création du compte.
-    """
+    """API pour l'inscription d'un nouvel utilisateur avec tokens JWT"""
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
@@ -85,25 +109,38 @@ class RegisterView(generics.CreateAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API pour la gestion des utilisateurs.
-    """
+    """API pour la gestion complète des utilisateurs"""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAdminUser]
+    parser_classes = [JSONParser]  # ✅ Ajout du bon parseur JSON
 
     def get_queryset(self):
+        """Gestion des permissions sur la liste des utilisateurs"""
         user = self.request.user
         if user.is_staff:
             return User.objects.all()
         return User.objects.filter(id=user.id)
 
+    def destroy(self, request, *args, **kwargs):
+        """Supprimer un utilisateur"""
+        user = self.get_object()
+        user.delete()
+        return Response({"message": "Utilisateur supprimé avec succès"}, status=200)
+
+    @action(detail=True, methods=['put'], permission_classes=[IsAdminUser])
+    def update_user(self, request, pk=None):
+        """Modifier un utilisateur"""
+        user = self.get_object()
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
 
 class MessageViewSet(viewsets.ModelViewSet):
-    """
-    API pour l'envoi et la réception des messages entre utilisateurs.
-    """
+    """API pour l'envoi et la réception des messages entre utilisateurs."""
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
@@ -116,9 +153,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """
-    ✅ Surcharge la connexion pour inclure les infos utilisateur
-    """
+    """Surcharge la connexion pour inclure les infos utilisateur"""
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
