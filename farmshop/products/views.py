@@ -1,11 +1,11 @@
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, filters, status
+
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
+
 from rest_framework.response import Response
-from .models import Product, Rental, Category
-from .serializers import ProductSerializer, RentalSerializer, CategorySerializer
+from .models import Rental, Category, Wishlist
+from .serializers import ProductSerializer, RentalSerializer, CategorySerializer, WishlistSerializer
 
 from rest_framework import viewsets, permissions
 from .models import Product
@@ -32,6 +32,16 @@ class RentalViewSet(viewsets.ModelViewSet):
     queryset = Rental.objects.all()
     serializer_class = RentalSerializer
     permission_classes = [IsAuthenticated]
+
+    class WishlistViewSet(viewsets.ModelViewSet):
+        serializer_class = WishlistSerializer
+        permission_classes = [permissions.IsAuthenticated]
+
+        def get_queryset(self):
+            return Wishlist.objects.filter(user=self.request.user)
+
+        def perform_create(self, serializer):
+            serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product_id')
@@ -62,3 +72,13 @@ class RentalViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'message': 'Rental created successfully', 'rental_id': rental.id}, status=status.HTTP_201_CREATED)
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

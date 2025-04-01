@@ -1,23 +1,19 @@
 from django.contrib import admin
 from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    # ✅ Routes API organisées
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/products/', include('products.urls')),
     path('api/blog/', include('blog.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
-
-    # ✅ Routes d'authentification
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    # ✅ Vérifie que l'URL `/api/users/` est bien enregistrée
     path('api/users/', include('users.urls')),
-
-    # API Django REST Framework (authentification basique)
     path('api-auth/', include('rest_framework.urls')),
 ]

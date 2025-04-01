@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Product, Rental, Category
+from .models import Product, Rental, Category, Wishlist
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +32,18 @@ class RentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = '__all__'
+
+class WishlistSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(),
+        write_only=True
+    )
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'product', 'product_id', 'added_at']
+
+    def create(self, validated_data):
+        product = validated_data.pop('product_id')  # On récupère l'ID réel
+        return Wishlist.objects.create(product=product, **validated_data)

@@ -53,7 +53,10 @@ INSTALLED_APPS = [
     'users',
     'rest_framework.authtoken',
     'django_filters',
+    'drf_spectacular',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -101,29 +105,34 @@ STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',  # Permet d'utiliser le login Django
-        'rest_framework.authentication.TokenAuthentication',  # Permet l'authentification par token
-
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
-
-'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',  # Backend de filtrage pour DRF
-        'rest_framework.filters.SearchFilter',  # Permet la recherche
-        'rest_framework.filters.OrderingFilter',  #  Permet d'ajouter un tri des résultats
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
     ),
-
-
-'DEFAULT_PERMISSION_CLASSES': (
-
-        'rest_framework.permissions.AllowAny', # ✅ Tout le monde peut voir les produits
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'FarmShop API',
+    'DESCRIPTION': 'Documentation de l\'API FarmShop',
+    'VERSION': '1.0.0',
 }
 
 
 
+
+
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Token valable 1 jour
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Refresh Token valable 7 jours
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
 ROOT_URLCONF = 'farmshop.urls'
