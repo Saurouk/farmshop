@@ -4,7 +4,11 @@
       <h1>{{ article.title }}</h1>
       <p class="text-muted">Par {{ article.author }} – {{ formatDate(article.created_at) }}</p>
       <p>{{ article.content }}</p>
+
+      <!-- 🔽 Affichage des commentaires -->
+      <CommentList />
     </div>
+
     <div v-else class="alert alert-info">Chargement de l'article...</div>
   </div>
 </template>
@@ -13,6 +17,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import CommentList from '@/components/CommentList.vue'; // ✅ Import du composant
 
 const route = useRoute();
 const article = ref(null);
