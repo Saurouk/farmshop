@@ -1468,3 +1468,61 @@ Traceback (most recent call last):
 TypeError: Field 'id' expected a number but got <Product: Tracteur puissant>.
 
 "POST /api/products/wishlist/ HTTP/1.1" 500 253006
+Not Found: /
+"GET / HTTP/1.1" 404 3941
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3992
+Unauthorized: /api/products/wishlist/
+"GET /api/products/wishlist/ HTTP/1.1" 401 10092
+Unauthorized: /api/products/wishlist/
+"GET /api/products/wishlist/ HTTP/1.1" 401 10092
+Unauthorized: /api/products/wishlist/
+"GET /api/products/wishlist/ HTTP/1.1" 401 10092
+Unauthorized: /api/products/wishlist/
+"GET /api/products/wishlist/ HTTP/1.1" 401 10092
+Not Found: /
+"GET / HTTP/1.1" 404 3941
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3992
+Not Found: /api/blog/articles/
+"GET /api/blog/articles/ HTTP/1.1" 404 10424
+Not Found: /api/comments/
+"GET /api/comments/ HTTP/1.1" 404 3998
+Unauthorized: /api/blog/reports/
+"GET /api/blog/reports/ HTTP/1.1" 401 10041
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
+Not Found: /api/blog/blog/
+"GET /api/blog/blog/ HTTP/1.1" 404 9745
+Not Found: /api/blog/blog/1/
+"GET /api/blog/blog/1/ HTTP/1.1" 404 9751
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3992
+Not Found: /api/blog/1
+"GET /api/blog/1 HTTP/1.1" 404 9733
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3992
+Not Found: /api/blog/2/
+"GET /api/blog/2/ HTTP/1.1" 404 9736
+Not Found: /api/blog/1/
+"GET /api/blog/1/ HTTP/1.1" 404 9736
+Not Found: /api/blog/2/
+"GET /api/blog/2/ HTTP/1.1" 404 9736
+Not Found: /api/blog/articles
+"GET /api/blog/articles HTTP/1.1" 404 9754
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3992
+Not Found: /api/blog/article
+"GET /api/blog/article HTTP/1.1" 404 9751
+Not Found: /api/blog/2
+"GET /api/blog/2 HTTP/1.1" 404 9733

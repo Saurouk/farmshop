@@ -1,4 +1,3 @@
-/* router/index.js */
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import ProductsView from '../views/ProductsView.vue';
@@ -14,6 +13,7 @@ const routes = [
   { path: '/products', component: ProductsView },
   { path: '/products/:id', component: ProductDetailView },
   { path: '/blog', component: BlogView },
+  { path: '/blog/:id', component: () => import('@/views/ArticleDetail.vue') },
   { path: '/contact', component: ContactView },
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
@@ -24,13 +24,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-  path: '/admin/dashboard',
-  name: 'AdminDashboard',
-  component: () => import('@/views/AdminDashboard.vue'),
-  meta: { requiresAuth: true, requiresAdmin: true }
-}
-
-
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: () => import('@/views/AdminDashboard.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  }
 ];
 
 const router = createRouter({
@@ -39,14 +37,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  console.log("Redirection vers :", to.path);
-  console.log("Admin status avant navigation:", auth.state.isAdmin);
-
   if (to.meta.requiresAuth && !auth.state.isAuthenticated) {
-    console.warn("🔒 Redirection vers login (Non authentifié)");
     next('/login');
   } else if (to.meta.requiresAdmin && !auth.state.isAdmin) {
-    console.warn("🚫 Redirection vers accueil (Non admin)");
     next('/');
   } else {
     next();

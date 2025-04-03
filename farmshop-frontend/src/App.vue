@@ -12,7 +12,7 @@ import Navbar from './components/Navbar.vue';
 </template>
 
 <style>
-/* Ajoute ton CSS global ici */
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
