@@ -4094,3 +4094,39 @@ Unauthorized: /api/users/me/
 "GET /api/users/me/ HTTP/1.1" 401 51
 Unauthorized: /auth/login/
 "POST /auth/login/ HTTP/1.1" 401 63
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
+Method Not Allowed: /api/blog/
+"POST /api/blog/ HTTP/1.1" 405 41
