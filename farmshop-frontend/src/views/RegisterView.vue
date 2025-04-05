@@ -23,6 +23,7 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import auth from "@/stores/auth";
 
 const username = ref("");
 const email = ref("");
@@ -44,10 +45,20 @@ const register = async () => {
       password: password.value,
     });
 
-    // ✅ Rediriger vers la page de connexion après inscription
-    router.push("/login");
+    const { access, refresh, user } = response.data;
+
+    localStorage.setItem("access_token", access);
+    localStorage.setItem("refresh_token", refresh);
+    localStorage.setItem("username", user.username);
+    localStorage.setItem("isAdmin", user.is_staff ? "true" : "false");
+
+    // si tu utilises le store global :
+    auth.setUser(user);
+
+    router.push("/");
   } catch (error) {
     errorMessage.value = "Erreur lors de l'inscription. Veuillez réessayer.";
+    console.error("❌ Erreur inscription :", error);
   }
 };
 </script>

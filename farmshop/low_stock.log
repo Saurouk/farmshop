@@ -4092,3 +4092,5 @@ Unauthorized: /api/users/me/
 "GET /api/users/me/ HTTP/1.1" 401 51
 Unauthorized: /api/users/me/
 "GET /api/users/me/ HTTP/1.1" 401 51
+Unauthorized: /auth/login/
+"POST /auth/login/ HTTP/1.1" 401 63
