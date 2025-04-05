@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth.models import update_last_login
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
@@ -67,9 +68,14 @@ def create_user(request):
     """Créer un utilisateur (admin uniquement)"""
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
+        user = serializer.save(commit=False) if hasattr(serializer, 'save') else None
+        if user:
+            user.set_password(request.data['password'])  # ✅ Hachage du mot de passe
+            user.save()
+            return Response(UserSerializer(user).data, status=201)
+        return Response({"error": "Impossible de créer l'utilisateur"}, status=400)
     return Response(serializer.errors, status=400)
+
 
 
 @api_view(['GET'])
@@ -153,7 +159,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """Surcharge la connexion pour inclure les infos utilisateur"""
+
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -167,6 +173,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
+
+            update_last_login(None, user)
+
             response.data["user"] = UserSerializer(user).data
         else:
             return Response({"error": "Nom d'utilisateur ou mot de passe incorrect."}, status=401)

@@ -10,8 +10,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'content', 'author', 'created_at', 'updated_at', 'is_published', 'comments_count']
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')  # ✅ Lire le username de l'utilisateur
-    article_title = serializers.ReadOnlyField(source='article.title')  # ✅ Affiche le titre de l'article au lieu de son ID
+    user = serializers.ReadOnlyField(source='user.username')
+    article_title = serializers.ReadOnlyField(source='article.title', read_only=True)
+    article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
 
     class Meta:
         model = Comment

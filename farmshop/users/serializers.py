@@ -12,13 +12,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'profile_picture', 'is_staff', 'admin_contact', 'inbox']  #
+        fields = ['id', 'username', 'email', 'password', 'profile_picture', 'is_staff', 'admin_contact', 'inbox']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         """ ✅ Crée un utilisateur avec un mot de passe sécurisé """
         password = validated_data.pop('password', None)
-        user = User(**validated_data)
+        user = self.Meta.model(**validated_data)
         if password:
             user.set_password(password)  # Hash du mot de passe
         user.save()
@@ -45,6 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
         """ ✅ Récupère la boîte de réception de l'utilisateur """
         messages = Message.objects.filter(recipient=obj).order_by('-created_at')
         return MessageSerializer(messages, many=True).data
+
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.SlugRelatedField(slug_field='username', read_only=True)
