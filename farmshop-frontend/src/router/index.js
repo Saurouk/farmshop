@@ -14,6 +14,7 @@ const routes = [
   { path: '/products/:id', component: ProductDetailView },
   { path: '/blog', component: BlogView },
   { path: '/blog/:id', component: () => import('@/views/ArticleDetail.vue') },
+  { path: '/blog/:id/edit', component: () => import('@/views/ArticleEditView.vue'), meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/contact', component: ContactView },
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },

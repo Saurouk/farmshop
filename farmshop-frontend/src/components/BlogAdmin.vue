@@ -83,14 +83,18 @@ const token = localStorage.getItem("access_token")
 const headers = { Authorization: `Bearer ${token}` }
 
 const fetchAll = async () => {
-  const [a, c, r] = await Promise.all([
-    axios.get("http://127.0.0.1:8000/api/blog/", { headers }),
-    axios.get("http://127.0.0.1:8000/api/blog/comments/", { headers }),
-    axios.get("http://127.0.0.1:8000/api/blog/admin/reported-comments/", { headers })
-  ])
-  articles.value = a.data
-  comments.value = c.data
-  reports.value = r.data
+  try {
+    const [a, c, r] = await Promise.all([
+      axios.get("http://127.0.0.1:8000/api/blog/", { headers }),
+      axios.get("http://127.0.0.1:8000/api/blog/comments/", { headers }),
+      axios.get("http://127.0.0.1:8000/api/blog/admin/reported-comments/", { headers })
+    ])
+    articles.value = a.data
+    comments.value = c.data
+    reports.value = r.data
+  } catch (err) {
+    console.error("❌ Erreur lors de la récupération des données:", err)
+  }
 }
 
 const formatDate = (date) => {
@@ -114,8 +118,7 @@ const submitForm = async () => {
     resetForm()
     fetchAll()
   } catch (err) {
-    console.error("❌ Erreur lors de l'envoi de l'article :", err.response)
-    alert("Erreur lors de l'envoi de l'article")
+    console.error("❌ Erreur lors de l'envoi de l'article:", err)
   }
 }
 
