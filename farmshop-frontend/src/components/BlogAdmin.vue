@@ -87,7 +87,7 @@ const fetchAll = async () => {
     const [a, c, r] = await Promise.all([
       axios.get("http://127.0.0.1:8000/api/blog/", { headers }),
       axios.get("http://127.0.0.1:8000/api/blog/comments/", { headers }),
-      axios.get("http://127.0.0.1:8000/api/blog/admin/reported-comments/", { headers })
+      axios.get("http://127.0.0.1:8000/api/blog/reports/", { headers })
     ])
     articles.value = a.data
     comments.value = c.data
@@ -98,9 +98,13 @@ const fetchAll = async () => {
 }
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  })
+  try {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    })
+  } catch {
+    return "Date invalide"
+  }
 }
 
 const showCreateForm = () => {

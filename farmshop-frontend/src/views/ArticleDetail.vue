@@ -16,6 +16,30 @@
         <button v-if="isStaff" @click="startEdit" class="btn btn-outline-warning mt-2">✏️ Modifier</button>
       </div>
     </div>
+
+    <div v-if="article">
+      <hr class="my-4">
+      <h4>Commentaires</h4>
+      <div v-if="comments.length">
+        <ul class="list-group mb-3">
+          <li class="list-group-item" v-for="c in comments" :key="c.id">
+            <strong>{{ c.user }}</strong><br>
+            {{ c.content }}
+            <div class="text-muted small">{{ formatDate(c.created_at) }}</div>
+          </li>
+        </ul>
+      </div>
+      <div v-else>
+        <p class="text-muted">Aucun commentaire pour le moment.</p>
+      </div>
+      <div class="mb-3">
+        <textarea v-model="commentContent" class="form-control" placeholder="Ajouter un commentaire..." rows="3" />
+        <div class="d-flex justify-content-end mt-2">
+          <button @click="submitComment" class="btn btn-primary">💬 Publier</button>
+        </div>
+      </div>
+    </div>
+
     <div v-else class="text-center mt-5">
       <p>Chargement de l'article...</p>
     </div>
@@ -36,14 +60,25 @@ const token = localStorage.getItem("access_token")
 const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
 const isStaff = ref(false)
+const comments = ref([])
+const commentContent = ref('')
 
 const fetchArticle = async () => {
   try {
-    const res = await axios.get(`http://127.0.0.1:8000/api/blog/${route.params.id}/`, { headers })
+    const res = await axios.get(`http://127.0.0.1:8000/api/blog/articles/${route.params.id}/`, { headers })
     article.value = res.data
     form.value = { title: res.data.title, content: res.data.content }
   } catch (err) {
-    console.error("Erreur de chargement :", err)
+    console.error("❌ Erreur fetchArticle :", err.response || err)
+  }
+}
+
+const fetchComments = async () => {
+  try {
+    const res = await axios.get(`http://127.0.0.1:8000/api/blog/comments/?article=${route.params.id}`, { headers })
+    comments.value = res.data
+  } catch (err) {
+    console.error("❌ Erreur fetchComments :", err.response || err)
   }
 }
 
@@ -53,7 +88,7 @@ const checkIfAdmin = async () => {
     const res = await axios.get("http://127.0.0.1:8000/api/users/me/", { headers })
     isStaff.value = res.data.is_staff
   } catch (err) {
-    console.error("Erreur lors de la vérification admin :", err)
+    console.error("❌ Erreur checkIfAdmin :", err.response || err)
   }
 }
 
@@ -75,17 +110,32 @@ const cancelEdit = () => {
 
 const saveChanges = async () => {
   try {
-    const res = await axios.put(`http://127.0.0.1:8000/api/blog/${route.params.id}/`, form.value, { headers })
+    const res = await axios.put(`http://127.0.0.1:8000/api/blog/articles/${route.params.id}/`, form.value, { headers })
     article.value = res.data
     isEditing.value = false
   } catch (err) {
-    console.error("Erreur lors de la mise à jour :", err)
+    console.error("❌ Erreur saveChanges :", err.response || err)
     alert("Erreur lors de la mise à jour de l'article.")
+  }
+}
+
+const submitComment = async () => {
+  try {
+    await axios.post("http://127.0.0.1:8000/api/blog/comments/", {
+      article: route.params.id,
+      content: commentContent.value
+    }, { headers })
+    commentContent.value = ''
+    fetchComments()
+  } catch (err) {
+    console.error("❌ Erreur submitComment :", err.response || err)
+    alert("Erreur lors de la publication du commentaire.")
   }
 }
 
 onMounted(() => {
   fetchArticle()
+  fetchComments()
   checkIfAdmin()
 })
 </script>
