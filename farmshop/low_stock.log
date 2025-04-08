@@ -4741,3 +4741,5 @@ Not Found: /api/blog/admin/resolved-reports/
 "GET /api/blog/admin/resolved-reports/ HTTP/1.1" 404 11535
 Not Found: /api/blog/admin/resolved-reports/
 "GET /api/blog/admin/resolved-reports/ HTTP/1.1" 404 11535
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 4166

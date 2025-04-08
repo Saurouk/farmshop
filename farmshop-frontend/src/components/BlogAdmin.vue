@@ -1,25 +1,29 @@
 <template>
   <div class="blog-admin">
-    <h2 class="mb-4">📝 Gestion du blog</h2>
+    <h2 class="mb-4">Gestion du blog</h2>
 
     <div class="btn-group mb-4">
-      <button @click="activeSection = 'articles'" :class="sectionClass('articles')">📄 Articles</button>
-      <button @click="activeSection = 'comments'" :class="sectionClass('comments')">💬 Commentaires</button>
+      <button @click="activeSection = 'articles'" :class="sectionClass('articles')">Articles</button>
+      <button @click="activeSection = 'comments'" :class="sectionClass('comments')">Commentaires</button>
       <button @click="activeSection = 'reports'" :class="sectionClass('reports')">
-        🚨 Signalements <span v-if="reports.length" class="badge bg-danger ms-2">{{ reports.length }}</span>
+        Signalements <span v-if="reports.length" class="badge bg-danger ms-2">{{ reports.length }}</span>
+      </button>
+      <button @click="activeSection = 'resolved'" :class="sectionClass('resolved')">
+        Signalés traités <span v-if="resolvedReports.length" class="badge bg-secondary ms-2">{{ resolvedReports.length }}</span>
       </button>
     </div>
 
+    <!-- ARTICLES -->
     <div v-if="activeSection === 'articles'">
-      <h3 class="mb-3">📰 Liste des articles</h3>
+      <h3>Liste des articles</h3>
       <button @click="showCreateForm" class="btn btn-success mb-3">+ Nouvel article</button>
 
       <div v-if="createMode || editingArticle" class="card card-body shadow-sm mb-4">
         <input v-model="form.title" class="form-control mb-2" placeholder="Titre de l'article" />
         <textarea v-model="form.content" class="form-control mb-2" rows="4" placeholder="Contenu..."></textarea>
         <div class="d-flex justify-content-end gap-2">
-          <button @click="submitForm" class="btn btn-primary">✅ {{ editingArticle ? 'Mettre à jour' : 'Publier' }}</button>
-          <button @click="resetForm" class="btn btn-outline-secondary">❌ Annuler</button>
+          <button @click="submitForm" class="btn btn-primary">{{ editingArticle ? 'Mettre à jour' : 'Publier' }}</button>
+          <button @click="resetForm" class="btn btn-outline-secondary">Annuler</button>
         </div>
       </div>
 
@@ -30,15 +34,16 @@
             <div class="text-muted small">📅 {{ formatDate(a.created_at) }}</div>
           </div>
           <div class="d-flex gap-2">
-            <button @click="editArticle(a)" class="btn btn-sm btn-outline-warning">✏️ Éditer</button>
-            <button @click="deleteArticle(a.id)" class="btn btn-sm btn-outline-danger">🗑️ Supprimer</button>
+            <button @click="editArticle(a)" class="btn btn-sm btn-outline-warning">Éditer</button>
+            <button @click="deleteArticle(a.id)" class="btn btn-sm btn-outline-danger">Supprimer</button>
           </div>
         </li>
       </ul>
     </div>
 
+    <!-- COMMENTAIRES -->
     <div v-if="activeSection === 'comments'">
-      <h3 class="mb-3">💬 Tous les commentaires</h3>
+      <h3>Tous les commentaires</h3>
       <ul class="list-group">
         <li class="list-group-item" v-for="c in comments" :key="c.id">
           <strong>{{ c.user }}</strong> sur <em>{{ c.article_title }}</em><br />
@@ -48,18 +53,42 @@
       </ul>
     </div>
 
+    <!-- SIGNALEMENTS EN ATTENTE -->
     <div v-if="activeSection === 'reports'">
-      <h3 class="mb-3">🚨 Signalements en attente</h3>
+      <h3>Signalements en attente</h3>
       <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between align-items-start bg-warning-subtle" v-for="r in reports" :key="r.id">
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start bg-warning-subtle"
+          v-for="r in reports"
+          :key="r.id"
+        >
           <div>
             <strong>Commentaire #{{ r.reported_comment }}</strong><br />
-            <span class="text-muted small">🔎 Par : {{ r.reporter }}</span><br />
-            <span class="text-muted small">💬 Motif : {{ r.reason }}</span>
+            <span class="text-muted small">Signalé par : {{ r.reporter }}</span><br />
+            <span class="text-muted small">Motif : {{ r.reason }}</span>
           </div>
           <div class="d-flex gap-2">
-            <button @click="deleteComment(r.reported_comment)" class="btn btn-sm btn-danger">🗑️ Supprimer</button>
-            <button @click="ignoreReport(r.reported_comment)" class="btn btn-sm btn-outline-dark">🚫 Ignorer</button>
+            <button @click="deleteComment(r.reported_comment)" class="btn btn-sm btn-danger">Supprimer</button>
+            <button @click="ignoreReport(r.reported_comment)" class="btn btn-sm btn-outline-dark">Ignorer</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- SIGNALEMENTS TRAITÉS -->
+    <div v-if="activeSection === 'resolved'">
+      <h3>Signalements traités</h3>
+      <ul class="list-group">
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start"
+          v-for="r in resolvedReports"
+          :key="r.id"
+        >
+          <div>
+            <strong>Commentaire #{{ r.reported_comment }}</strong><br />
+            <span class="text-muted small">Signalé par : {{ r.reporter }}</span><br />
+            <span class="text-muted small">Motif : {{ r.reason }}</span>
+            <div class="badge bg-secondary mt-2">✅ Traité</div>
           </div>
         </li>
       </ul>
@@ -75,6 +104,7 @@ const activeSection = ref('articles')
 const articles = ref([])
 const comments = ref([])
 const reports = ref([])
+const resolvedReports = ref([])
 
 const form = ref({ title: '', content: '' })
 const createMode = ref(false)
@@ -85,23 +115,18 @@ const headers = { Authorization: `Bearer ${token}` }
 
 const fetchAll = async () => {
   try {
-    const [a, c, r] = await Promise.all([
+    const [a, c, allReports] = await Promise.all([
       axios.get("http://127.0.0.1:8000/api/blog/articles/", { headers }),
       axios.get("http://127.0.0.1:8000/api/blog/comments/", { headers }),
       axios.get("http://127.0.0.1:8000/api/blog/reports/", { headers })
     ])
     articles.value = a.data
     comments.value = c.data
-    reports.value = r.data
+    reports.value = allReports.data.filter(r => !r.resolved)
+    resolvedReports.value = allReports.data.filter(r => r.resolved)
   } catch (err) {
     console.error("❌ Erreur lors de la récupération des données:", err)
   }
-}
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('fr-FR', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  })
 }
 
 const showCreateForm = () => {
@@ -150,6 +175,12 @@ const ignoreReport = async (id) => {
   fetchAll()
 }
 
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
+}
+
 const sectionClass = (section) => {
   return {
     'btn': true,
@@ -163,7 +194,6 @@ onMounted(fetchAll)
 
 <style scoped>
 .blog-admin {
-  text-align: left;
   max-width: 850px;
   margin: auto;
   padding-bottom: 50px;
