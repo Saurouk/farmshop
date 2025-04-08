@@ -49,10 +49,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter()
 const article = ref(null)
 const form = ref({ title: '', content: '' })
 const isEditing = ref(false)
@@ -121,6 +122,10 @@ const saveChanges = async () => {
 }
 
 const submitComment = async () => {
+  if (!token) {
+    router.push('/login')
+    return
+  }
   try {
     await axios.post("http://127.0.0.1:8000/api/blog/comments/", {
       article: route.params.id,
@@ -135,6 +140,11 @@ const submitComment = async () => {
 }
 
 const reportComment = async (commentId) => {
+  if (!token) {
+    router.push('/login')
+    return
+  }
+
   const reason = prompt("Raison du signalement :")
   if (!reason) return
 
