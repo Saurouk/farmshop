@@ -4464,3 +4464,15 @@ Not Found: /api/blog/
 "GET /api/blog/ HTTP/1.1" 404 6587
 Not Found: /api/blog/
 "GET /api/blog/ HTTP/1.1" 404 6587
+Not Found: /api/blog/1/
+"GET /api/blog/1/ HTTP/1.1" 404 11472
+Not Found: /api/blog/1/
+"GET /api/blog/1/ HTTP/1.1" 404 11472
+Not Found: /api/blog/1
+"GET /api/blog/1 HTTP/1.1" 404 11469
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 4166
+Unauthorized: /api/blog/reports/
+"GET /api/blog/reports/ HTTP/1.1" 401 10052
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 4166

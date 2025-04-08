@@ -54,7 +54,8 @@
         <li class="list-group-item d-flex justify-content-between align-items-start bg-warning-subtle" v-for="r in reports" :key="r.id">
           <div>
             <strong>Commentaire #{{ r.reported_comment }}</strong><br />
-            <span class="text-muted small">Motif : {{ r.reason }}</span>
+            <span class="text-muted small">🔎 Par : {{ r.reporter }}</span><br />
+            <span class="text-muted small">💬 Motif : {{ r.reason }}</span>
           </div>
           <div class="d-flex gap-2">
             <button @click="deleteComment(r.reported_comment)" class="btn btn-sm btn-danger">🗑️ Supprimer</button>
@@ -85,7 +86,7 @@ const headers = { Authorization: `Bearer ${token}` }
 const fetchAll = async () => {
   try {
     const [a, c, r] = await Promise.all([
-      axios.get("http://127.0.0.1:8000/api/blog/", { headers }),
+      axios.get("http://127.0.0.1:8000/api/blog/articles/", { headers }),
       axios.get("http://127.0.0.1:8000/api/blog/comments/", { headers }),
       axios.get("http://127.0.0.1:8000/api/blog/reports/", { headers })
     ])
@@ -98,13 +99,9 @@ const fetchAll = async () => {
 }
 
 const formatDate = (date) => {
-  try {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    })
-  } catch {
-    return "Date invalide"
-  }
+  return new Date(date).toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
 }
 
 const showCreateForm = () => {
@@ -115,9 +112,9 @@ const showCreateForm = () => {
 const submitForm = async () => {
   try {
     if (editingArticle.value) {
-      await axios.put(`http://127.0.0.1:8000/api/blog/${editingArticle.value.id}/`, form.value, { headers })
+      await axios.put(`http://127.0.0.1:8000/api/blog/articles/${editingArticle.value.id}/`, form.value, { headers })
     } else {
-      await axios.post("http://127.0.0.1:8000/api/blog/", form.value, { headers })
+      await axios.post("http://127.0.0.1:8000/api/blog/articles/", form.value, { headers })
     }
     resetForm()
     fetchAll()
@@ -139,7 +136,7 @@ const resetForm = () => {
 }
 
 const deleteArticle = async (id) => {
-  await axios.delete(`http://127.0.0.1:8000/api/blog/${id}/`, { headers })
+  await axios.delete(`http://127.0.0.1:8000/api/blog/articles/${id}/`, { headers })
   fetchAll()
 }
 

@@ -26,6 +26,7 @@
             <strong>{{ c.user }}</strong><br>
             {{ c.content }}
             <div class="text-muted small">{{ formatDate(c.created_at) }}</div>
+            <button class="btn btn-sm btn-outline-danger mt-2" @click="reportComment(c.id)">🚨 Signaler</button>
           </li>
         </ul>
       </div>
@@ -78,7 +79,7 @@ const fetchComments = async () => {
     const res = await axios.get(`http://127.0.0.1:8000/api/blog/comments/?article=${route.params.id}`, { headers })
     comments.value = res.data
   } catch (err) {
-    console.error("❌ Erreur fetchComments :", err.response || err)
+    console.error("Erreur chargement commentaires :", err)
   }
 }
 
@@ -88,7 +89,7 @@ const checkIfAdmin = async () => {
     const res = await axios.get("http://127.0.0.1:8000/api/users/me/", { headers })
     isStaff.value = res.data.is_staff
   } catch (err) {
-    console.error("❌ Erreur checkIfAdmin :", err.response || err)
+    console.error("Erreur lors de la vérification admin :", err)
   }
 }
 
@@ -114,7 +115,7 @@ const saveChanges = async () => {
     article.value = res.data
     isEditing.value = false
   } catch (err) {
-    console.error("❌ Erreur saveChanges :", err.response || err)
+    console.error("Erreur lors de la mise à jour :", err)
     alert("Erreur lors de la mise à jour de l'article.")
   }
 }
@@ -128,8 +129,24 @@ const submitComment = async () => {
     commentContent.value = ''
     fetchComments()
   } catch (err) {
-    console.error("❌ Erreur submitComment :", err.response || err)
+    console.error("❌ Erreur publication commentaire:", err.response || err)
     alert("Erreur lors de la publication du commentaire.")
+  }
+}
+
+const reportComment = async (commentId) => {
+  const reason = prompt("Raison du signalement :")
+  if (!reason) return
+
+  try {
+    await axios.post("http://127.0.0.1:8000/api/blog/reports/", {
+      reported_comment: commentId,
+      reason: reason
+    }, { headers })
+    alert("✅ Commentaire signalé !")
+  } catch (err) {
+    console.error("❌ Erreur signalement :", err.response || err)
+    alert("Erreur lors du signalement.")
   }
 }
 
