@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+db.sqlite3
+env/
+venv/
+*.env
+
+# Django
+*.pot
+*.pyc
+local_settings.py
+media/
+staticfiles/
+
+# VSCode / PyCharm
+.idea/
+.vscode/
+
+# Node / Vue.js
+node_modules/
+dist/
+*.log
+
+# System
+.DS_Store
+Thumbs.db
