@@ -28,6 +28,12 @@ const routes = [
     name: 'AdminDashboard',
     component: () => import('@/views/AdminDashboard.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/produits',
+    name: 'ProductAdmin',
+    component: () => import('@/components/ProductAdmin.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ];
 
@@ -37,9 +43,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !auth.state.isAuthenticated) {
+  if (to.meta.requiresAuth && !auth.isLoggedIn.value) {
     next('/login');
-  } else if (to.meta.requiresAdmin && !auth.state.isAdmin) {
+  } else if (to.meta.requiresAdmin && !auth.isAdmin.value) {
     next('/');
   } else {
     next();

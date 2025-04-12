@@ -2,7 +2,7 @@
 import { reactive, computed } from 'vue';
 import axios from 'axios';
 
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // ✅ Assure-toi que cette URL est correcte
+const API_BASE_URL = "http://127.0.0.1:8000/api"; //
 
 const state = reactive({
   username: localStorage.getItem('username') || null,

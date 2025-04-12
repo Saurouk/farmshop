@@ -1,11 +1,12 @@
-from rest_framework import serializers
-from .models import Product, Rental, Category, Wishlist
+# products/serializers.py
 
+from rest_framework import serializers
+from .models import Product, Rental, Category, Wishlist, UNIT_CHOICES
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']  # Champs à afficher pour les catégories
+        fields = ['id', 'name']
 
 class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
@@ -14,18 +15,16 @@ class ProductSerializer(serializers.ModelSerializer):
         write_only=True
     )
     category = serializers.StringRelatedField(read_only=True)
-    unit_of_measure = serializers.ChoiceField(
-        choices=Product.UNIT_CHOICES,
-        default='piece'
-    )
-    is_available = serializers.ReadOnlyField()  # ✅ Champs dynamique, pas stocké en base
+    unit_of_measure = serializers.ChoiceField(choices=UNIT_CHOICES, default='piece')
+    is_available = serializers.ReadOnlyField()
+    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'stock',
-            'low_stock_threshold',  # ✅ Champ toujours présent
-            'is_available', 'category_id', 'category', 'unit_of_measure'
+            'low_stock_threshold', 'is_available', 'category_id',
+            'category', 'unit_of_measure', 'image'
         ]
 
 class RentalSerializer(serializers.ModelSerializer):
@@ -45,5 +44,5 @@ class WishlistSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'product_id', 'added_at']
 
     def create(self, validated_data):
-        product = validated_data.pop('product_id')  # On récupère l'ID réel
+        product = validated_data.pop('product_id')
         return Wishlist.objects.create(product=product, **validated_data)
