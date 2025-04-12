@@ -18,7 +18,14 @@
           </router-link>
         </div>
       </div>
+
+      <div class="pagination d-flex justify-content-center gap-3 mt-4">
+        <button class="btn btn-outline-secondary" @click="prevPage" :disabled="!previous">← Précédent</button>
+        <span>Page {{ page }}</span>
+        <button class="btn btn-outline-secondary" @click="nextPage" :disabled="!next">Suivant →</button>
+      </div>
     </div>
+
     <div v-else class="alert alert-info">Chargement des articles...</div>
   </div>
 </template>
@@ -28,15 +35,36 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const articles = ref([])
+const page = ref(1)
+const next = ref(null)
+const previous = ref(null)
 
-onMounted(async () => {
+const fetchArticles = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/blog/')
-    articles.value = res.data
+    const res = await axios.get(`http://127.0.0.1:8000/api/blog/articles/?page=${page.value}`)
+    articles.value = res.data.results
+    next.value = res.data.next
+    previous.value = res.data.previous
   } catch (err) {
     console.error("❌ Erreur chargement articles :", err)
   }
-})
+}
+
+const nextPage = () => {
+  if (next.value) {
+    page.value++
+    fetchArticles()
+  }
+}
+
+const prevPage = () => {
+  if (previous.value && page.value > 1) {
+    page.value--
+    fetchArticles()
+  }
+}
+
+onMounted(fetchArticles)
 
 const getExcerpt = (text, length = 150) => {
   return text.length > length ? text.slice(0, length) : text
