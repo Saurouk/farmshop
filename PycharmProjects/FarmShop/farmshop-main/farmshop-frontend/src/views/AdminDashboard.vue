@@ -20,8 +20,7 @@
 import { ref } from "vue";
 import UsersManagement from "@/components/UsersManagement.vue";
 import BlogAdmin from "@/components/BlogAdmin.vue";
-import ProductAdmin from "@/components/ProductAdmin.vue"; // ✅ Important
-
+import ProductAdmin from "@/components/ProductAdmin.vue"; // ✅ Ajout du composant
 const activeTab = ref("users");
 </script>
 
