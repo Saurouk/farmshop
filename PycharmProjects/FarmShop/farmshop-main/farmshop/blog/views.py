@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework import status
 import logging
 
 from .models import Article, Comment, Report
@@ -42,10 +43,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             user = self.request.user
-            logger.info(f"💬 Creating comment by user: {user.username} (is_staff={user.is_staff})")
+            logger.info(f"\ud83d\udcac Creating comment by user: {user.username} (is_staff={user.is_staff})")
             serializer.save(user=user)
         except Exception as e:
-            logger.error(f"❌ Error creating comment: {str(e)}")
+            logger.error(f"\u274c Error creating comment: {str(e)}")
             raise
 
 
@@ -59,7 +60,11 @@ class ReportViewSet(viewsets.ModelViewSet):
         return [permissions.IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(reporter=self.request.user)
+        user = self.request.user
+        comment = serializer.validated_data['reported_comment']
+        if Report.objects.filter(reporter=user, reported_comment=comment).exists():
+            raise serializers.ValidationError({"detail": "Vous avez déjà signalé ce commentaire."})
+        serializer.save(reporter=user)
 
     @action(detail=True, methods=['DELETE'], permission_classes=[permissions.IsAdminUser])
     def delete_reported_comment(self, request, pk=None):

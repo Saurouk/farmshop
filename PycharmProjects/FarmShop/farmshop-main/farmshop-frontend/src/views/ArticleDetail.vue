@@ -3,12 +3,7 @@
     <div v-if="article" class="card shadow-sm p-4">
       <div v-if="isEditing">
         <input v-model="form.title" class="form-control mb-3" placeholder="Titre" />
-        <QuillEditor
-          v-model:content="form.content"
-          contentType="html"
-          theme="snow"
-          class="mb-3"
-        />
+        <QuillEditor v-model:content="form.content" contentType="html" theme="snow" class="mb-3" />
         <div class="d-flex justify-content-end gap-2">
           <button @click="saveChanges" class="btn btn-primary">Enregistrer</button>
           <button @click="cancelEdit" class="btn btn-outline-secondary">Annuler</button>
@@ -23,19 +18,19 @@
     </div>
 
     <div v-if="article">
-      <hr class="my-4">
+      <hr class="my-4" />
       <h4>Commentaires</h4>
 
       <div v-if="comments.length">
         <ul class="list-group mb-3">
           <li class="list-group-item" v-for="c in comments" :key="c.id">
-            <strong>{{ c.user }}</strong><br>
+            <strong>{{ c.user }}</strong><br />
             <div>{{ c.content }}</div>
             <div class="text-muted small">{{ formatDate(c.created_at) }}</div>
             <button
               v-if="isAuthenticated"
               class="btn btn-sm btn-outline-danger mt-2"
-              @click="reportComment(c.id)"
+              @click="openReportModal(c.id)"
             >
               🚨 Signaler
             </button>
@@ -51,12 +46,33 @@
         <div class="d-flex justify-content-end mt-2">
           <button @click="submitComment" class="btn btn-primary">💬 Publier</button>
         </div>
+        <div v-if="successMessage" class="alert alert-success mt-2">{{ successMessage }}</div>
+        <div v-if="errorMessage" class="alert alert-warning mt-2">{{ errorMessage }}</div>
       </div>
       <div v-else class="alert alert-info">Veuillez vous connecter pour commenter.</div>
     </div>
 
     <div v-else class="text-center mt-5">
       <p>Chargement de l'article...</p>
+    </div>
+
+    <!-- Modal de signalement -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h5>Signaler un commentaire</h5>
+        <select v-model="reportReason" class="form-select mb-2">
+          <option disabled value="">Choisir une raison</option>
+          <option>Propos injurieux</option>
+          <option>Hors sujet</option>
+          <option>Spam</option>
+          <option>Autre</option>
+        </select>
+        <textarea v-model="reportMessage" class="form-control mb-2" placeholder="Message (optionnel)" rows="3" />
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary" @click="closeModal">Annuler</button>
+          <button class="btn btn-danger" @click="submitReport">Envoyer</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -80,6 +96,14 @@ const isAuthenticated = ref(false)
 
 const form = ref({ title: '', content: '' })
 
+const showModal = ref(false)
+const commentToReport = ref(null)
+const reportReason = ref('')
+const reportMessage = ref('')
+
+const successMessage = ref('')
+const errorMessage = ref('')
+
 const token = localStorage.getItem("access_token")
 const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
@@ -89,25 +113,18 @@ const fetchArticle = async () => {
     article.value = res.data
     form.value = { title: res.data.title, content: res.data.content }
   } catch (err) {
-    console.error("❌ Erreur fetchArticle :", err.response || err)
+    console.error("❌ Erreur fetchArticle :", err)
   }
 }
 
 const fetchComments = async () => {
   try {
     const res = await axios.get(`http://127.0.0.1:8000/api/blog/comments/?article=${route.params.id}`, { headers })
-    if (Array.isArray(res.data.results)) {
-      comments.value = res.data.results
-      console.log("✅ Commentaires paginés reçus :", comments.value)
-    } else {
-      comments.value = []
-      console.warn("❗️Format inattendu pour les commentaires :", res.data)
-    }
+    comments.value = Array.isArray(res.data.results) ? res.data.results : []
   } catch (err) {
     console.error("Erreur chargement commentaires :", err)
   }
 }
-
 
 const checkAuth = async () => {
   if (!token) return
@@ -120,17 +137,12 @@ const checkAuth = async () => {
   }
 }
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleString('fr-FR', {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  })
-}
+const formatDate = (date) => new Date(date).toLocaleString('fr-FR', {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+})
 
-const startEdit = () => {
-  isEditing.value = true
-}
-
+const startEdit = () => isEditing.value = true
 const cancelEdit = () => {
   form.value = { title: article.value.title, content: article.value.content }
   isEditing.value = false
@@ -142,17 +154,16 @@ const saveChanges = async () => {
     article.value = res.data
     isEditing.value = false
   } catch (err) {
-    console.error("Erreur update article :", err)
     alert("Erreur lors de la mise à jour de l'article.")
   }
 }
 
 const submitComment = async () => {
   if (!commentContent.value.trim()) {
-    alert("Votre commentaire est vide.")
+    errorMessage.value = "Votre commentaire est vide."
+    setTimeout(() => errorMessage.value = '', 4000)
     return
   }
-
   try {
     await axios.post("http://127.0.0.1:8000/api/blog/comments/", {
       article: route.params.id,
@@ -160,30 +171,47 @@ const submitComment = async () => {
     }, { headers })
     commentContent.value = ''
     await fetchComments()
+    successMessage.value = "💬 Commentaire publié avec succès."
+    setTimeout(() => successMessage.value = '', 4000)
   } catch (err) {
-    console.error("❌ Erreur publication commentaire:", err.response || err)
-    alert("Erreur lors de la publication du commentaire.")
+    errorMessage.value = "Erreur lors de la publication du commentaire."
+    setTimeout(() => errorMessage.value = '', 4000)
   }
 }
 
-const reportComment = async (commentId) => {
-  if (!isAuthenticated.value) {
-    router.push('/login')
+const openReportModal = (id) => {
+  commentToReport.value = id
+  showModal.value = true
+  reportReason.value = ''
+  reportMessage.value = ''
+}
+
+const closeModal = () => showModal.value = false
+
+const submitReport = async () => {
+  if (!reportReason.value) {
+    alert("Veuillez sélectionner une raison.")
     return
   }
-
-  const reason = prompt("Raison du signalement :")
-  if (!reason) return
-
   try {
     await axios.post("http://127.0.0.1:8000/api/blog/reports/", {
-      reported_comment: commentId,
-      reason: reason
+      reported_comment: commentToReport.value,
+      reason: `${reportReason.value} - ${reportMessage.value}`
     }, { headers })
-    alert("Merci pour votre signalement. Un administrateur le traitera sous peu.")
+    successMessage.value = "🚨 Commentaire signalé avec succès. Merci !"
+    closeModal()
   } catch (err) {
-    console.error("❌ Erreur signalement :", err.response || err)
-    alert("Erreur lors du signalement.")
+    if (err.response?.status === 400) {
+      errorMessage.value = "⚠️ Vous avez déjà signalé ce commentaire."
+    } else {
+      errorMessage.value = "Erreur lors du signalement."
+    }
+    closeModal()
+  } finally {
+    setTimeout(() => {
+      successMessage.value = ''
+      errorMessage.value = ''
+    }, 4000)
   }
 }
 
@@ -200,5 +228,22 @@ onMounted(() => {
 }
 .article-body {
   margin-top: 1rem;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 </style>
