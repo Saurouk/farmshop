@@ -6,7 +6,7 @@ from django.db import models
 
 logger = logging.getLogger(__name__)
 
-# ✅ Déplacé ici pour éviter les imports circulaires
+
 UNIT_CHOICES = [
     ('kg', 'Kilogram'),
     ('piece', 'Piece'),
@@ -31,7 +31,7 @@ class Product(models.Model):
         choices=UNIT_CHOICES,
         default='piece'
     )
-    image = models.ImageField(upload_to='products/', null=True, blank=True)  # ✅ Ajout du champ image
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     category = models.ForeignKey(
         'Category',
         on_delete=models.SET_NULL,

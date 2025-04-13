@@ -1,34 +1,60 @@
 <template>
   <div class="product-admin">
-    <h2 class="mb-4">Gestion des produits</h2>
+    <h2 class="mb-4">🛒 Gestion des produits</h2>
 
     <!-- Formulaire -->
-    <div class="card card-body mb-4" v-if="showForm">
-      <input v-model="form.name" class="form-control mb-2" placeholder="Nom du produit" />
-      <textarea v-model="form.description" class="form-control mb-2" placeholder="Description"></textarea>
-      <input v-model="form.price" type="number" class="form-control mb-2" placeholder="Prix" />
-      <input v-model="form.stock" type="number" class="form-control mb-2" placeholder="Stock" />
-      <select v-model="form.unit_of_measure" class="form-select mb-2">
-        <option value="kg">Kilogramme</option>
-        <option value="piece">Pièce</option>
-        <option value="litre">Litre</option>
-      </select>
+    <div class="card shadow rounded p-4 mb-4" v-if="showForm">
+      <div class="mb-3">
+        <label class="form-label fw-bold">Nom du produit</label>
+        <input v-model="form.name" class="form-control" placeholder="Nom du produit" />
+      </div>
 
-      <select v-model="form.category_id" class="form-select mb-2" v-if="Array.isArray(categories)">
-        <option disabled value="">-- Catégorie --</option>
-        <option v-for="c in categories" :value="c.id" :key="c.id">{{ c.name }}</option>
-      </select>
-      <p v-else>Chargement des catégories...</p>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Description</label>
+        <textarea v-model="form.description" class="form-control" placeholder="Description du produit"></textarea>
+      </div>
 
-      <div class="form-check mb-2">
+      <div class="mb-3">
+        <label class="form-label fw-bold">Prix (€)</label>
+        <input v-model.number="form.price" type="number" min="0" step="0.01" class="form-control" placeholder="Prix en euros" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Quantité en stock</label>
+        <input v-model.number="form.stock" type="number" min="0" class="form-control" placeholder="Quantité disponible" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Unité de mesure</label>
+        <select v-model="form.unit_of_measure" class="form-select">
+          <option value="kg">Kilogramme</option>
+          <option value="piece">Pièce</option>
+          <option value="litre">Litre</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Catégorie</label>
+        <select v-model="form.category_id" class="form-select" v-if="Array.isArray(categories)">
+          <option disabled value="">-- Catégorie --</option>
+          <option v-for="c in categories" :value="c.id" :key="c.id">{{ c.name }}</option>
+        </select>
+        <p v-else>Chargement des catégories...</p>
+      </div>
+
+      <div class="form-check mb-3">
         <input type="checkbox" class="form-check-input" v-model="form.is_rentable" id="rentableCheck">
         <label for="rentableCheck" class="form-check-label">Disponible à la location</label>
       </div>
-      <input type="file" class="form-control mb-2" @change="handleImage" />
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Image du produit</label>
+        <input type="file" class="form-control" @change="handleImage" />
+      </div>
 
       <div class="d-flex justify-content-end gap-2">
-        <button @click="submitForm" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
-        <button @click="resetForm" class="btn btn-outline-secondary">Annuler</button>
+        <button @click="submitForm" class="btn btn-success">{{ editMode ? '💾 Mettre à jour' : '✅ Ajouter' }}</button>
+        <button @click="resetForm" class="btn btn-outline-secondary">❌ Annuler</button>
       </div>
     </div>
 
@@ -36,7 +62,7 @@
       {{ showForm ? 'Fermer le formulaire' : '+ Ajouter un produit' }}
     </button>
 
-    <!-- Liste -->
+    <!-- Liste des produits -->
     <ul class="list-group">
       <li v-for="p in products" :key="p.id" class="list-group-item d-flex justify-content-between align-items-center">
         <div>
@@ -57,7 +83,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const products = ref([])
-const categories = ref([]) // ✅ Toujours initialiser comme tableau
+const categories = ref([])
 const showForm = ref(false)
 const editMode = ref(false)
 const form = ref({
@@ -82,7 +108,7 @@ const fetchProducts = async () => {
 const fetchCategories = async () => {
   try {
     const res = await axios.get("http://127.0.0.1:8000/api/products/categories/", { headers })
-    categories.value = Array.isArray(res.data) ? res.data : []
+    categories.value = Array.isArray(res.data.results) ? res.data.results : res.data
   } catch (err) {
     console.error("❌ Erreur chargement catégories :", err)
     categories.value = []
