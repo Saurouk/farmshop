@@ -62,7 +62,6 @@
       {{ showForm ? 'Fermer le formulaire' : '+ Ajouter un produit' }}
     </button>
 
-    <!-- Liste des produits -->
     <ul class="list-group">
       <li v-for="p in products" :key="p.id" class="list-group-item d-flex justify-content-between align-items-center">
         <div>
@@ -140,7 +139,13 @@ const submitForm = async () => {
     fetchProducts()
   } catch (err) {
     console.error("❌ Erreur envoi produit :", err)
-    alert("Erreur lors de l'enregistrement.")
+
+    if (err.response && err.response.data) {
+      console.error("📩 Détails erreur serveur :", err.response.data)
+      alert("Erreur : " + JSON.stringify(err.response.data))
+    } else {
+      alert("Erreur lors de l'enregistrement.")
+    }
   }
 }
 

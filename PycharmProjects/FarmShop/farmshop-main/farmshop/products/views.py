@@ -28,7 +28,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAdminUser]
 
@@ -36,6 +36,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if self.request.method in ['GET']:
             return [permissions.AllowAny()]
         return super().get_permissions()
+
 
 
 class RentalViewSet(viewsets.ModelViewSet):

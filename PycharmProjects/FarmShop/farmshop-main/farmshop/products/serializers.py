@@ -24,7 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'description', 'price', 'stock',
             'low_stock_threshold', 'is_available', 'category_id',
-            'category', 'unit_of_measure', 'image'
+            'category', 'unit_of_measure', 'image', 'is_rentable'
         ]
 
 class RentalSerializer(serializers.ModelSerializer):
