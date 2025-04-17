@@ -2,7 +2,6 @@
   <div class="product-admin">
     <h2 class="mb-4">🛒 Gestion des produits</h2>
 
-    <!-- Formulaire -->
     <div class="card shadow rounded p-4 mb-4" v-if="showForm">
       <div class="mb-3">
         <label class="form-label fw-bold">Nom du produit</label>
@@ -16,12 +15,12 @@
 
       <div class="mb-3">
         <label class="form-label fw-bold">Prix (€)</label>
-        <input v-model.number="form.price" type="number" min="0" step="0.01" class="form-control" placeholder="Prix en euros" />
+        <input v-model.number="form.price" type="number" min="0" step="0.01" class="form-control" />
       </div>
 
       <div class="mb-3">
         <label class="form-label fw-bold">Quantité en stock</label>
-        <input v-model.number="form.stock" type="number" min="0" class="form-control" placeholder="Quantité disponible" />
+        <input v-model.number="form.stock" type="number" min="0" class="form-control" />
       </div>
 
       <div class="mb-3">
@@ -35,25 +34,31 @@
 
       <div class="mb-3">
         <label class="form-label fw-bold">Catégorie</label>
-        <select v-model="form.category_id" class="form-select" v-if="Array.isArray(categories)">
+        <select v-model="form.category_id" class="form-select">
           <option disabled value="">-- Catégorie --</option>
           <option v-for="c in categories" :value="c.id" :key="c.id">{{ c.name }}</option>
         </select>
-        <p v-else>Chargement des catégories...</p>
       </div>
 
       <div class="form-check mb-3">
         <input type="checkbox" class="form-check-input" v-model="form.is_rentable" id="rentableCheck">
-        <label for="rentableCheck" class="form-check-label">Disponible à la location</label>
+        <label class="form-check-label" for="rentableCheck">Disponible à la location</label>
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Image du produit</label>
+        <label class="form-label fw-bold">Image principale</label>
         <input type="file" class="form-control" @change="handleImage" />
       </div>
 
+      <div class="mb-3">
+        <label class="form-label fw-bold">Images de la galerie</label>
+        <input type="file" class="form-control" multiple @change="handleGallery" />
+      </div>
+
       <div class="d-flex justify-content-end gap-2">
-        <button @click="submitForm" class="btn btn-success">{{ editMode ? '💾 Mettre à jour' : '✅ Ajouter' }}</button>
+        <button @click="submitForm" class="btn btn-success">
+          {{ editMode ? '💾 Mettre à jour' : '✅ Ajouter' }}
+        </button>
         <button @click="resetForm" class="btn btn-outline-secondary">❌ Annuler</button>
       </div>
     </div>
@@ -83,14 +88,16 @@ import axios from 'axios'
 
 const products = ref([])
 const categories = ref([])
+const gallery = ref([])
 const showForm = ref(false)
 const editMode = ref(false)
+const editingId = ref(null)
+
 const form = ref({
   name: '', description: '', price: 0, stock: 0,
   unit_of_measure: 'piece', is_rentable: false,
   category_id: '', image: null
 })
-const editingId = ref(null)
 
 const token = localStorage.getItem('access_token')
 const headers = { Authorization: `Bearer ${token}` }
@@ -119,11 +126,20 @@ const handleImage = (e) => {
   if (file) form.value.image = file
 }
 
+const handleGallery = (e) => {
+  gallery.value = Array.from(e.target.files)
+}
+
 const submitForm = async () => {
   const formData = new FormData()
   for (const key in form.value) {
-    formData.append(key, form.value[key])
+    if (form.value[key] !== null) {
+      formData.append(key, form.value[key])
+    }
   }
+  gallery.value.forEach(file => {
+    formData.append('gallery', file)
+  })
 
   try {
     if (editMode.value) {
@@ -139,13 +155,7 @@ const submitForm = async () => {
     fetchProducts()
   } catch (err) {
     console.error("❌ Erreur envoi produit :", err)
-
-    if (err.response && err.response.data) {
-      console.error("📩 Détails erreur serveur :", err.response.data)
-      alert("Erreur : " + JSON.stringify(err.response.data))
-    } else {
-      alert("Erreur lors de l'enregistrement.")
-    }
+    alert("Erreur lors de l'enregistrement.")
   }
 }
 
@@ -174,6 +184,7 @@ const resetForm = () => {
   editingId.value = null
   showForm.value = false
   editMode.value = false
+  gallery.value = []
 }
 
 const deleteProduct = async (id) => {

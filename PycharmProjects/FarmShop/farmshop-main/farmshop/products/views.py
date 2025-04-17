@@ -2,8 +2,9 @@ import logging
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
-from .models import Product, Rental, Category, Wishlist
+from .models import Product, Rental, Category, Wishlist, ProductImage
 from .serializers import (
     ProductSerializer,
     RentalSerializer,
@@ -20,11 +21,32 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'stock']
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_permissions(self):
         if self.request.method in ['GET']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        product = serializer.save()
+        gallery_files = request.FILES.getlist('gallery')
+        for file in gallery_files:
+            ProductImage.objects.create(product=product, image=file)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        product = serializer.save()
+        gallery_files = request.FILES.getlist('gallery')
+        for file in gallery_files:
+            ProductImage.objects.create(product=product, image=file)
+        return Response(serializer.data)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -36,7 +58,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if self.request.method in ['GET']:
             return [permissions.AllowAny()]
         return super().get_permissions()
-
 
 
 class RentalViewSet(viewsets.ModelViewSet):

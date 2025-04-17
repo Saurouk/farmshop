@@ -1,12 +1,17 @@
 # products/serializers.py
 
 from rest_framework import serializers
-from .models import Product, Rental, Category, Wishlist, UNIT_CHOICES
+from .models import Product, Rental, Category, Wishlist, ProductImage, UNIT_CHOICES
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image']
 
 class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
@@ -18,13 +23,14 @@ class ProductSerializer(serializers.ModelSerializer):
     unit_of_measure = serializers.ChoiceField(choices=UNIT_CHOICES, default='piece')
     is_available = serializers.ReadOnlyField()
     image = serializers.ImageField(required=False, allow_null=True)
+    images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'stock',
             'low_stock_threshold', 'is_available', 'category_id',
-            'category', 'unit_of_measure', 'image', 'is_rentable'
+            'category', 'unit_of_measure', 'image', 'images', 'is_rentable'
         ]
 
 class RentalSerializer(serializers.ModelSerializer):
