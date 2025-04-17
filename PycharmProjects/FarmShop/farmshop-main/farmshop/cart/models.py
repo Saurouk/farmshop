@@ -10,11 +10,7 @@ class Cart(models.Model):
         return f"Cart of {self.user.username}"
 
     def total_price(self):
-        """
-        Calculer le prix total du panier (somme des total_price de chaque item)
-        """
         return sum(item.total_price() for item in self.items.all())
-
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
@@ -25,7 +21,4 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
     def total_price(self):
-        """
-        Calculer le prix total pour cet article (quantité * prix)
-        """
         return self.quantity * self.product.price

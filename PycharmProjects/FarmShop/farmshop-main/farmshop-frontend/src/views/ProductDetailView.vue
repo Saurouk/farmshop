@@ -33,6 +33,11 @@
             <span v-if="product.is_rentable" class="text-success">Disponible à la location ✅</span>
           </span>
         </div>
+
+        <div class="d-flex mt-4 gap-2">
+          <input type="number" min="1" v-model="quantity" class="form-control w-auto" />
+          <button class="btn btn-primary" @click="addToCart">Ajouter au panier</button>
+        </div>
       </div>
     </div>
 
@@ -52,29 +57,56 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import VueEasyLightbox from 'vue-easy-lightbox'
 
-const route = useRoute();
-const product = ref({ images: [] });
-const lightboxVisible = ref(false);
-const lightboxIndex = ref(0);
+const route = useRoute()
+const router = useRouter()
+const product = ref({ images: [] })
+const lightboxVisible = ref(false)
+const lightboxIndex = ref(0)
+const quantity = ref(1)
+
+const token = localStorage.getItem('access_token')
+const isLoggedIn = !!token
 
 const showLightbox = (index) => {
   lightboxIndex.value = index
   lightboxVisible.value = true
 }
 
+const addToCart = async () => {
+  if (!isLoggedIn) {
+    router.push('/login')
+    return
+  }
+
+  try {
+    await axios.post("http://127.0.0.1:8000/api/cart/add_item/", {
+      product_id: product.value.id,
+      quantity: quantity.value
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    router.push('/cart')
+  } catch (error) {
+    console.error("❌ Erreur ajout au panier :", error)
+    alert("Erreur lors de l'ajout au panier.")
+  }
+}
+
 onMounted(async () => {
   try {
-    const productId = route.params.id;
-    const response = await axios.get(`http://127.0.0.1:8000/api/products/${productId}/`);
-    product.value = response.data;
+    const productId = route.params.id
+    const response = await axios.get(`http://127.0.0.1:8000/api/products/${productId}/`)
+    product.value = response.data
   } catch (error) {
-    console.error('❌ Erreur API:', error);
+    console.error('❌ Erreur API:', error)
   }
-});
+})
 </script>
 
 <style scoped>

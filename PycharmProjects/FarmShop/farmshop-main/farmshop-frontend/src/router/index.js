@@ -12,6 +12,12 @@ const routes = [
   { path: '/', component: HomeView },
   { path: '/products', component: ProductsView },
   { path: '/products/:id', component: ProductDetailView },
+  {
+    path: '/cart',
+    name: 'CartView',
+    component: () => import('@/views/CartView.vue'),
+    meta: { requiresAuth: true }
+  },
   { path: '/blog', component: BlogView },
   { path: '/blog/:id', component: () => import('@/views/ArticleDetail.vue') },
   { path: '/contact', component: ContactView },

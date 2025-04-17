@@ -1,11 +1,8 @@
-# products/models.py
-
 import logging
 from django.conf import settings
 from django.db import models
 
 logger = logging.getLogger(__name__)
-
 
 UNIT_CHOICES = [
     ('kg', 'Kilogram'),
@@ -44,8 +41,11 @@ class Product(models.Model):
     def is_available(self):
         return self.stock > 0
 
+    def is_low_stock(self):
+        return self.stock <= self.low_stock_threshold
+
     def check_stock(self):
-        if self.stock <= self.low_stock_threshold:
+        if self.is_low_stock():
             logger.warning(f"Low stock alert: {self.name} has only {self.stock} left!")
 
     def save(self, *args, **kwargs):

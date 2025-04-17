@@ -1,3 +1,4 @@
+import traceback
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,9 +12,6 @@ class CartViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        """
-        Récupérer le contenu du panier pour l'utilisateur connecté
-        """
         cart, created = Cart.objects.get_or_create(user=request.user)
         serializer = CartSerializer(cart)
         return Response(serializer.data)
@@ -23,55 +21,51 @@ class AddItemToCartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Ajouter un produit au panier et ajuster le stock
-        """
-        product_id = request.data.get('product_id')
-        quantity = int(request.data.get('quantity', 1))
-
         try:
+            product_id = request.data.get('product_id')
+            quantity = int(request.data.get('quantity', 1))
+
             product = Product.objects.get(id=product_id)
+
+            if not product.is_available:
+                return Response({'error': f"{product.name} is not available."}, status=400)
+
+            if product.stock == 0:
+                return Response({'error': f"{product.name} is out of stock and cannot be added to cart."}, status=400)
+
+            if quantity > product.stock:
+                return Response({'error': f"Only {product.stock} units available."}, status=400)
+
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            if not created:
+                if item.quantity + quantity > product.stock:
+                    return Response({'error': f"Exceeds stock. Add only {product.stock - item.quantity} more."}, status=400)
+                item.quantity += quantity
+            else:
+                item.quantity = quantity
+
+            product.stock -= quantity
+            product.save()
+            item.save()
+
+            if product.is_low_stock():
+                print(f"Low stock alert for {product.name}. Only {product.stock} left.")
+
+            return Response({'message': f"{quantity} unit(s) of {product.name} added to cart."}, status=201)
+
         except Product.DoesNotExist:
             return Response({'error': 'Product does not exist'}, status=404)
-
-        # Vérifier si le produit est disponible
-        if not product.is_available:
-            return Response({'error': f"{product.name} is not available."}, status=400)
-
-        # Vérifier si le produit est en rupture de stock
-        if product.stock == 0:
-            return Response({'error': f"{product.name} is out of stock and cannot be added to cart."}, status=400)
-
-        if quantity > product.stock:
-            return Response({'error': f"Only {product.stock} units available."}, status=400)
-
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        if not created:
-            if item.quantity + quantity > product.stock:
-                return Response({'error': f"Exceeds stock. Add only {product.stock - item.quantity} more."}, status=400)
-            item.quantity += quantity
-        else:
-            item.quantity = quantity
-
-        product.stock -= quantity
-        product.save()
-        item.save()
-
-        # Vérification du seuil critique
-        if product.is_low_stock():
-            print(f"Low stock alert for {product.name}. Only {product.stock} left.")
-
-        return Response({'message': f"{quantity} unit(s) of {product.name} added to cart."}, status=201)
+        except Exception as e:
+            print("❌ Une erreur s'est produite lors de l'ajout au panier :")
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=500)
 
 
 class RemoveItemFromCartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Supprimer un produit du panier et réajuster le stock
-        """
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
 
