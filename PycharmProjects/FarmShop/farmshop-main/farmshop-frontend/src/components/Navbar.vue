@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-sm custom-navbar">
     <div class="container">
       <router-link class="navbar-brand text-white fw-bold" to="/">
         🌾 FarmShop
@@ -12,27 +12,37 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/">Accueil</router-link>
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/">
+              <font-awesome-icon icon="home" class="me-1" /> Accueil
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/products">Produits</router-link>
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/products">
+              <font-awesome-icon icon="box" class="me-1" /> Produits
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/blog">Blog</router-link>
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/blog">
+              <font-awesome-icon icon="book" class="me-1" /> Blog
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/contact">Contact</router-link>
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/contact">
+              <font-awesome-icon icon="envelope" class="me-1" /> Contact
+            </router-link>
           </li>
           <li v-if="isAdmin" class="nav-item">
-            <router-link class="nav-link text-white" active-class="fw-bold" to="/admin/dashboard">⚙️ Panel Admin</router-link>
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/admin/dashboard">
+              <font-awesome-icon icon="gear" class="me-1" /> Panel Admin
+            </router-link>
           </li>
         </ul>
 
         <CartIcon />
 
-        <div v-if="isAuthenticated" class="user-menu d-flex align-items-center">
+        <div v-if="isAuthenticated" class="user-menu d-flex align-items-center ms-4">
           <router-link class="btn btn-primary me-3" to="/profile">
-            👤 Mon Profil
+            <font-awesome-icon icon="user" class="me-1" /> Mon Profil
           </router-link>
           <span class="text-white fw-bold">👤 {{ username }}</span>
           <button @click="logout" class="btn btn-danger ms-3 fw-bold">Déconnexion</button>
@@ -72,5 +82,21 @@ const logout = () => {
 .user-menu {
   display: flex;
   align-items: center;
+}
+
+.custom-navbar {
+  font-size: 1.15rem;
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
+}
+
+.navbar-brand {
+  font-size: 1.7rem;
+}
+
+.nav-link {
+  font-size: 1.1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 </style>
