@@ -1,12 +1,7 @@
 <template>
   <div class="container py-5">
     <div v-if="product && product.name" class="card product-detail shadow-sm mx-auto">
-      <img
-        v-if="product.image"
-        :src="product.image"
-        class="card-img-top"
-        :alt="product.name"
-      />
+      <img v-if="product.image" :src="product.image" class="card-img-top" :alt="product.name" />
       <div class="card-body">
         <h2 class="card-title mb-3">{{ product.name }}</h2>
         <h4 class="text-success fw-bold">{{ product.price }} €</h4>
@@ -15,13 +10,7 @@
         <p class="mt-3 product-description">{{ product.description }}</p>
 
         <div class="gallery row mt-4">
-          <div
-            v-for="(img, index) in product.images"
-            :key="index"
-            class="col-md-3 mb-3"
-            @click="showLightbox(index)"
-            style="cursor: pointer;"
-          >
+          <div v-for="(img, index) in product.images" :key="index" class="col-md-3 mb-3" @click="showLightbox(index)" style="cursor: pointer;">
             <img :src="img.image" class="img-fluid rounded shadow-sm" />
           </div>
         </div>
@@ -41,12 +30,9 @@
       </div>
     </div>
 
-    <div v-else class="alert alert-warning text-center">
-      Chargement du produit...
-    </div>
+    <div v-else class="alert alert-warning text-center">Chargement du produit...</div>
 
-    <VueEasyLightbox
-      v-if="product && product.images && product.images.length"
+    <VueEasyLightbox v-if="product && product.images && product.images.length"
       :visible="lightboxVisible"
       :imgs="product.images.map(img => img.image)"
       :index="lightboxIndex"
@@ -57,19 +43,20 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import VueEasyLightbox from 'vue-easy-lightbox'
+import { useToast } from 'vue-toastification'
+import { fetchCartCount } from '@/stores/cart'
 
 const route = useRoute()
-const router = useRouter()
 const product = ref({ images: [] })
+const quantity = ref(1)
 const lightboxVisible = ref(false)
 const lightboxIndex = ref(0)
-const quantity = ref(1)
-
 const token = localStorage.getItem('access_token')
 const isLoggedIn = !!token
+const toast = useToast()
 
 const showLightbox = (index) => {
   lightboxIndex.value = index
@@ -78,7 +65,7 @@ const showLightbox = (index) => {
 
 const addToCart = async () => {
   if (!isLoggedIn) {
-    router.push('/login')
+    toast.warning('Vous devez être connecté pour ajouter au panier.')
     return
   }
 
@@ -91,10 +78,11 @@ const addToCart = async () => {
         Authorization: `Bearer ${token}`
       }
     })
-    router.push('/cart')
+    fetchCartCount()
+    toast.success('Produit ajouté au panier !')
   } catch (error) {
     console.error("❌ Erreur ajout au panier :", error)
-    alert("Erreur lors de l'ajout au panier.")
+    toast.error("Erreur lors de l'ajout au panier.")
   }
 }
 
@@ -115,22 +103,18 @@ onMounted(async () => {
   border-radius: 12px;
   overflow: hidden;
 }
-
 .card-img-top {
   height: 400px;
   object-fit: cover;
   border-bottom: 1px solid #ccc;
 }
-
 .card-body {
   padding: 30px;
 }
-
 .card-title {
   font-size: 1.8rem;
   font-weight: bold;
 }
-
 .product-description {
   font-size: 1.1rem;
   color: #444;

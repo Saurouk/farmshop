@@ -1,4 +1,3 @@
-/* Navbar.vue */
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-sm">
     <div class="container">
@@ -24,11 +23,12 @@
           <li class="nav-item">
             <router-link class="nav-link text-white" active-class="fw-bold" to="/contact">Contact</router-link>
           </li>
-          <!-- Lien vers le panneau admin, visible uniquement pour les administrateurs -->
           <li v-if="isAdmin" class="nav-item">
             <router-link class="nav-link text-white" active-class="fw-bold" to="/admin/dashboard">⚙️ Panel Admin</router-link>
           </li>
         </ul>
+
+        <CartIcon />
 
         <div v-if="isAuthenticated" class="user-menu d-flex align-items-center">
           <router-link class="btn btn-primary me-3" to="/profile">
@@ -47,26 +47,25 @@
 </template>
 
 <script setup>
-import { computed, watchEffect } from 'vue';
-import auth from '@/stores/auth';
-import { useRouter } from 'vue-router';
+import { computed, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import auth from '@/stores/auth'
+import CartIcon from '@/components/CartIcon.vue'
 
-const router = useRouter();
+const router = useRouter()
 
-// Propriétés calculées
-const isAuthenticated = computed(() => auth.state.isAuthenticated);
-const isAdmin = computed(() => auth.state.isAdmin);
-const username = computed(() => auth.state.username);
+const isAuthenticated = computed(() => auth.state.isAuthenticated)
+const isAdmin = computed(() => auth.state.isAdmin)
+const username = computed(() => auth.state.username)
 
-// Ajout d'un watcher pour suivre les changements de `isAdmin`
 watchEffect(() => {
-  console.log("🔄 Mise à jour de isAdmin:", isAdmin.value);
-});
+  console.log("🔄 Mise à jour de isAdmin:", isAdmin.value)
+})
 
 const logout = () => {
-  auth.logoutUser();
-  router.push('/');
-};
+  auth.logoutUser()
+  router.push('/')
+}
 </script>
 
 <style scoped>
