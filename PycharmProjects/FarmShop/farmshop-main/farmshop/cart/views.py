@@ -30,23 +30,19 @@ class AddItemToCartView(APIView):
             if not product.is_available:
                 return Response({'error': f"{product.name} is not available."}, status=400)
 
-            if product.stock == 0:
-                return Response({'error': f"{product.name} is out of stock and cannot be added to cart."}, status=400)
-
-            if quantity > product.stock:
-                return Response({'error': f"Only {product.stock} units available."}, status=400)
-
             cart, created = Cart.objects.get_or_create(user=request.user)
             item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-            if not created:
-                if item.quantity + quantity > product.stock:
-                    return Response({'error': f"Exceeds stock. Add only {product.stock - item.quantity} more."}, status=400)
-                item.quantity += quantity
-            else:
-                item.quantity = quantity
 
-            product.stock -= quantity
-            product.save()
+            total_requested = item.quantity + quantity if not created else quantity
+
+            if total_requested > product.stock:
+                return Response({'error': f"Only {product.stock - item.quantity} units available."}, status=400)
+
+            if created:
+                item.quantity = quantity
+            else:
+                item.quantity += quantity
+
             item.save()
 
             if product.is_low_stock():
@@ -81,12 +77,8 @@ class RemoveItemFromCartView(APIView):
 
         product = item.product
         if quantity >= item.quantity:
-            product.stock += item.quantity
-            product.save()
             item.delete()
         else:
-            product.stock += quantity
-            product.save()
             item.quantity -= quantity
             item.save()
 

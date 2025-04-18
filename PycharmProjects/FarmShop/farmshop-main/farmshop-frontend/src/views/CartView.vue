@@ -9,9 +9,9 @@
             <h5 class="mb-1">{{ item.product.name }}</h5>
             <p class="mb-1 text-muted">Prix unitaire : {{ item.product.price }} €</p>
             <p class="mb-1">Quantité :
-              <button @click="updateQuantity(item.product.id, item.quantity - 1)" class="btn btn-sm btn-outline-secondary me-1">-</button>
+              <button @click="decreaseQuantity(item)" class="btn btn-sm btn-outline-secondary me-1">-</button>
               {{ item.quantity }}
-              <button @click="updateQuantity(item.product.id, item.quantity + 1)" class="btn btn-sm btn-outline-secondary ms-1">+</button>
+              <button @click="increaseQuantity(item)" class="btn btn-sm btn-outline-secondary ms-1">+</button>
             </p>
           </div>
           <div class="text-end">
@@ -39,7 +39,6 @@ import axios from 'axios'
 import router from '@/router'
 
 const cart = ref(null)
-
 const token = localStorage.getItem('access_token')
 const headers = { Authorization: `Bearer ${token}` }
 
@@ -55,6 +54,35 @@ const fetchCart = async () => {
   }
 }
 
+const increaseQuantity = async (item) => {
+  try {
+    await axios.post('http://127.0.0.1:8000/api/cart/add_item/', {
+      product_id: item.product.id,
+      quantity: 1
+    }, { headers })
+    fetchCart()
+  } catch (err) {
+    console.error("❌ Erreur augmentation quantité :", err)
+  }
+}
+
+const decreaseQuantity = async (item) => {
+  if (item.quantity <= 1) {
+    await removeItem(item.product.id)
+    return
+  }
+
+  try {
+    await axios.post('http://127.0.0.1:8000/api/cart/remove_item/', {
+      product_id: item.product.id,
+      quantity: 1
+    }, { headers })
+    fetchCart()
+  } catch (err) {
+    console.error("❌ Erreur diminution quantité :", err)
+  }
+}
+
 const removeItem = async (productId) => {
   try {
     await axios.post('http://127.0.0.1:8000/api/cart/remove_item/', {
@@ -64,22 +92,6 @@ const removeItem = async (productId) => {
     fetchCart()
   } catch (err) {
     console.error("❌ Erreur suppression produit :", err)
-  }
-}
-
-const updateQuantity = async (productId, quantity) => {
-  if (quantity <= 0) {
-    removeItem(productId)
-    return
-  }
-  try {
-    await axios.post('http://127.0.0.1:8000/api/cart/add_item/', {
-      product_id: productId,
-      quantity: 1
-    }, { headers })
-    fetchCart()
-  } catch (err) {
-    console.error("❌ Erreur mise à jour quantité :", err)
   }
 }
 
