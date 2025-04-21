@@ -1,12 +1,12 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
-import ProductsView from '../views/ProductsView.vue';
-import ProductDetailView from '../views/ProductDetailView.vue';
-import BlogView from '../views/BlogView.vue';
-import ContactView from '../views/ContactView.vue';
-import LoginView from '../views/LoginView.vue';
-import RegisterView from '@/views/RegisterView.vue';
-import auth from '@/stores/auth';
+import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+import ProductsView from '../views/ProductsView.vue'
+import ProductDetailView from '../views/ProductDetailView.vue'
+import BlogView from '../views/BlogView.vue'
+import ContactView from '../views/ContactView.vue'
+import LoginView from '../views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import auth from '@/stores/auth'
 
 const routes = [
   { path: '/', component: HomeView },
@@ -16,6 +16,24 @@ const routes = [
     path: '/cart',
     name: 'CartView',
     component: () => import('@/views/CartView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/checkout',
+    name: 'CheckoutView',
+    component: () => import('@/views/CheckoutView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/confirmation/:id',
+    name: 'OrderConfirmationView',
+    component: () => import('@/views/OrderConfirmationView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/orders/history',
+    name: 'OrderHistoryView',
+    component: () => import('@/views/OrderHistoryView.vue'),
     meta: { requiresAuth: true }
   },
   { path: '/blog', component: BlogView },
@@ -41,21 +59,21 @@ const routes = [
     component: () => import('@/components/ProductAdmin.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   }
-];
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
-});
+})
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !auth.isLoggedIn.value) {
-    next('/login');
+    next('/login')
   } else if (to.meta.requiresAdmin && !auth.isAdmin.value) {
-    next('/');
+    next('/')
   } else {
-    next();
+    next()
   }
-});
+})
 
-export default router;
+export default router
