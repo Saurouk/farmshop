@@ -11,7 +11,7 @@
           <p class="mb-1 text-muted">Date : {{ formatDate(order.created_at) }}</p>
           <p class="mb-1">Total : <strong class="text-success">{{ order.total_price }} €</strong></p>
 
-          <div class="d-flex align-items-center mt-2">
+          <div class="d-flex align-items-center mt-2 mb-3">
             <label for="status-select" class="me-2">Statut :</label>
             <select v-model="order.status" class="form-select form-select-sm w-auto me-2">
               <option value="pending">En attente</option>
@@ -21,8 +21,15 @@
               <option value="delivered">Livrée</option>
               <option value="canceled">Annulée</option>
             </select>
-            <button class="btn btn-sm btn-primary" @click="updateStatus(order.id, order.status)">
+            <button class="btn btn-sm btn-primary me-2" @click="updateStatus(order.id, order.status)">
               Mettre à jour
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              @click="cancelOrder(order.id)"
+              v-if="order.status !== 'shipped' && order.status !== 'delivered' && order.status !== 'canceled'"
+            >
+              Annuler la commande
             </button>
           </div>
 
@@ -76,6 +83,17 @@ const updateStatus = async (orderId, status) => {
     toast.success("Statut mis à jour")
   } catch (err) {
     toast.error("Erreur mise à jour statut")
+    console.error(err)
+  }
+}
+
+const cancelOrder = async (orderId) => {
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/orders/admin/${orderId}/cancel/`, { headers })
+    toast.success("Commande annulée avec succès")
+    fetchOrders()
+  } catch (err) {
+    toast.error("Erreur lors de l'annulation")
     console.error(err)
   }
 }
