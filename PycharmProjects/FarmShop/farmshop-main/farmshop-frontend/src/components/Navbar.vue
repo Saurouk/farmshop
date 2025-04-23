@@ -36,6 +36,11 @@
               <font-awesome-icon icon="gear" class="me-1" /> Panel Admin
             </router-link>
           </li>
+          <li v-if="isAdmin" class="nav-item">
+            <router-link class="nav-link text-white" active-class="fw-bold" to="/admin/orders">
+              <font-awesome-icon icon="truck" class="me-1" /> Commandes
+            </router-link>
+          </li>
         </ul>
 
         <CartIcon />

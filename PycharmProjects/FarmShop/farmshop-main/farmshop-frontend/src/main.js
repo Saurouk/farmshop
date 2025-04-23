@@ -15,10 +15,11 @@ import {
   faEnvelope,
   faUser,
   faGear,
-  faReceipt
+  faReceipt,
+  faTruck
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHome, faBox, faBook, faEnvelope, faUser, faGear, faReceipt)
+library.add(faHome, faBox, faBook, faEnvelope, faUser, faGear, faReceipt, faTruck)
 
 const app = createApp(App)
 
