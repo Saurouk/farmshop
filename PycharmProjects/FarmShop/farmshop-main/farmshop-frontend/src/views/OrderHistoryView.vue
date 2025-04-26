@@ -23,6 +23,12 @@
               <span>{{ item.price_per_unit }} €</span>
             </li>
           </ul>
+
+          <div class="text-end mt-3">
+            <a :href="`${API_BASE_URL}/api/orders/admin/${order.id}/invoice/`" class="btn btn-outline-primary btn-sm" target="_blank">
+              Télécharger facture
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -37,17 +43,17 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+const API_BASE_URL = 'http://127.0.0.1:8000'
 const orders = ref([])
 const token = localStorage.getItem('access_token')
 const headers = { Authorization: `Bearer ${token}` }
 
 const fetchOrders = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/orders/history/', { headers })
-    console.log("✅ Commandes reçues :", res.data)
+    const res = await axios.get(`${API_BASE_URL}/api/orders/history/`, { headers })
     orders.value = res.data.results || []
   } catch (err) {
-    console.error("❌ Erreur chargement historique des commandes :", err)
+    console.error("Erreur chargement historique des commandes:", err)
   }
 }
 

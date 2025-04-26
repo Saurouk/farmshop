@@ -4,21 +4,8 @@
       <font-awesome-icon icon="truck" class="me-2" /> Gestion des commandes
     </h2>
 
-    <div class="mb-4 d-flex align-items-center gap-3">
-      <label class="fw-bold">Filtrer par statut :</label>
-      <select v-model="selectedStatus" class="form-select w-auto" @change="filterOrders">
-        <option value="">Tous</option>
-        <option value="pending">En attente</option>
-        <option value="confirmed">Confirmée</option>
-        <option value="preparing">Préparation</option>
-        <option value="shipped">Expédiée</option>
-        <option value="delivered">Livrée</option>
-        <option value="canceled">Annulée</option>
-      </select>
-    </div>
-
-    <div v-if="filteredOrders.length">
-      <div v-for="order in filteredOrders" :key="order.id" class="card mb-4 shadow-sm">
+    <div v-if="orders.length">
+      <div v-for="order in orders" :key="order.id" class="card mb-4 shadow-sm">
         <div class="card-body">
           <h5 class="card-title">Commande #{{ order.id }} - {{ order.user }}</h5>
           <p class="mb-1 text-muted">Date : {{ formatDate(order.created_at) }}</p>
@@ -34,8 +21,11 @@
               <option value="delivered">Livrée</option>
               <option value="canceled">Annulée</option>
             </select>
-            <button class="btn btn-sm btn-primary" @click="updateStatus(order.id, order.status)">
+            <button class="btn btn-sm btn-primary me-2" @click="updateStatus(order.id, order.status)">
               Mettre à jour
+            </button>
+            <button class="btn btn-sm btn-outline-success" @click="downloadInvoice(order.id)">
+              Télécharger Facture
             </button>
           </div>
 
@@ -60,12 +50,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
 
 const orders = ref([])
-const selectedStatus = ref("")
 const toast = useToast()
 
 const token = localStorage.getItem('access_token')
@@ -83,10 +72,7 @@ const fetchOrders = async () => {
 
 const updateStatus = async (orderId, status) => {
   try {
-    await axios.patch(`http://127.0.0.1:8000/api/orders/admin/${orderId}/update-status/`,
-      { status },
-      { headers }
-    )
+    await axios.patch(`http://127.0.0.1:8000/api/orders/admin/${orderId}/update-status/`, { status }, { headers })
     toast.success("Statut mis à jour")
   } catch (err) {
     toast.error("Erreur mise à jour statut")
@@ -94,14 +80,11 @@ const updateStatus = async (orderId, status) => {
   }
 }
 
-const filteredOrders = computed(() => {
-  if (!selectedStatus.value) return orders.value
-  return orders.value.filter(order => order.status === selectedStatus.value)
-})
+const downloadInvoice = (orderId) => {
+  window.open(`http://127.0.0.1:8000/api/orders/admin/${orderId}/invoice/`, '_blank')
+}
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleString()
-
-const filterOrders = () => {}
 
 onMounted(fetchOrders)
 </script>

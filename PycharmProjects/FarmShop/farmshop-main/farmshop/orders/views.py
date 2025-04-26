@@ -1,15 +1,18 @@
 import logging
 import stripe
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from cart.models import Cart, CartItem
+from weasyprint import HTML
 from .models import Order, OrderItem
 from django.conf import settings
 from .serializers import OrderSerializer
-from .permissions import IsAdminUser  # Assure-toi que cette permission est bien définie dans permissions.py
+from .permissions import IsAdminUser
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +21,6 @@ class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Convertir le panier en commande avec des messages d'erreur plus détaillés.
-        """
         try:
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
@@ -29,12 +29,10 @@ class CreateOrderView(APIView):
         if not cart.items.exists():
             return Response({"error": "Votre panier est vide. Ajoutez des produits avant de passer une commande."}, status=400)
 
-        # Vérifier si une commande déjà payée existe
         existing_order = Order.objects.filter(user=request.user, status='paid').exists()
         if existing_order:
             return Response({"error": "Vous avez déjà une commande payée en attente."}, status=400)
 
-        # Créer une commande
         order = Order.objects.create(user=request.user, total_price=0)
         total_price = 0
 
@@ -124,9 +122,6 @@ class AdminOrderActionsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def patch(self, request, order_id):
-        """
-        Changer le statut d'une commande
-        """
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
@@ -141,9 +136,6 @@ class AdminOrderActionsView(APIView):
         return Response({"message": f"Commande {order_id} mise à jour avec le statut {new_status}."}, status=status.HTTP_200_OK)
 
     def delete(self, request, order_id):
-        """
-        Annuler une commande
-        """
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
@@ -156,3 +148,20 @@ class AdminOrderActionsView(APIView):
         order.status = 'canceled'
         order.save()
         return Response({"message": f"Commande {order_id} annulée avec succès."}, status=status.HTTP_200_OK)
+
+
+class GenerateInvoiceView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, order_id):
+        try:
+            order = Order.objects.select_related('user').prefetch_related('items__product').get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({'error': 'Commande introuvable.'}, status=404)
+
+        html_content = render_to_string('invoice_template.html', {'order': order})
+        pdf_file = HTML(string=html_content).write_pdf()
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'filename=invoice_order_{order.id}.pdf'
+        return response

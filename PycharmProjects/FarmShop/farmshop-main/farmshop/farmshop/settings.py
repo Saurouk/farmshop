@@ -1,7 +1,6 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,7 +68,6 @@ CORS_EXPOSE_HEADERS = [
     'Content-Range',
 ]
 
-
 AUTH_USER_MODEL = 'users.User'
 
 LOGGING = {
@@ -130,7 +128,7 @@ ROOT_URLCONF = 'farmshop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'orders', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
