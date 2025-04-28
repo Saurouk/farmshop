@@ -25,6 +25,18 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/checkout/stripe',
+    name: 'CheckoutStripe',
+    component: () => import('@/views/CheckoutStripe.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/checkout/success',
+    name: 'CheckoutSuccess',
+    component: () => import('@/views/CheckoutSuccessView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/confirmation/:id',
     name: 'OrderConfirmationView',
     component: () => import('@/views/OrderConfirmationView.vue'),

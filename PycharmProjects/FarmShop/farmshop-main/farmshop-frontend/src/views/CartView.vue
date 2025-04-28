@@ -24,6 +24,10 @@
       <div class="text-end mt-4">
         <h5>Total du panier : <span class="text-success fw-bold">{{ cart.total_price }} €</span></h5>
         <p class="text-muted mt-2"><small>TVA incluse dans tous les prix affichés.</small></p>
+
+        <router-link to="/checkout/stripe" class="btn btn-success mt-3">
+          Payer maintenant
+        </router-link>
       </div>
     </div>
 
