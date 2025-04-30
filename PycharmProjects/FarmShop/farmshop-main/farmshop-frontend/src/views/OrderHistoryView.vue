@@ -65,7 +65,8 @@ const formatStatus = (status) => {
     preparing: "Préparation",
     shipped: "Expédiée",
     delivered: "Livrée",
-    canceled: "Annulée"
+    canceled: "Annulée",
+    paid: "Payée"
   }
   return map[status] || status
 }

@@ -10,9 +10,15 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from cart.models import Cart, CartItem
 from weasyprint import HTML
 from .models import Order, OrderItem
+from users.models import User
 from django.conf import settings
 from .serializers import OrderSerializer
 from .permissions import IsAdminUser
+from dotenv import load_dotenv
+from pathlib import Path
+import os
+
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +81,14 @@ class UserOrdersView(ListAPIView):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
 
 
+class AdminListOrdersView(ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.all().order_by('-created_at')
+
+
 class CreateStripePaymentIntentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -95,27 +109,60 @@ class StripeWebhookView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
+        logger.info("✅ StripeWebhookView POST reçu")
+
         payload = request.body
         sig_header = request.headers.get('Stripe-Signature', '')
-        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+        endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+        logger.info("📦 Payload reçu de Stripe : %s", payload)
+        logger.info("📝 Signature Stripe : %s", sig_header)
+        logger.info("🔑 Webhook Secret utilisé : %s", endpoint_secret)
 
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-        except ValueError:
-            logger.error("Invalid payload")
+        except ValueError as e:
+            logger.error("❌ Erreur payload Stripe : %s", str(e))
             return Response({"error": "Invalid payload"}, status=400)
-        except stripe.error.SignatureVerificationError:
-            logger.error("Invalid signature")
+        except stripe.error.SignatureVerificationError as e:
+            logger.error("❌ Erreur signature Stripe : %s", str(e))
             return Response({"error": "Invalid signature"}, status=400)
 
         if event['type'] == 'payment_intent.succeeded':
-            logger.info("PaymentIntent succeeded event received.")
-        elif event['type'] == 'charge.succeeded':
-            logger.info("Charge succeeded event received.")
-        else:
-            logger.info(f"Unhandled event type: {event['type']}")
+            logger.info("✅ Événement payment_intent.succeeded reçu")
+            payment_intent = event['data']['object']
+            user_id = payment_intent['metadata'].get('user_id')
+            logger.info("👤 ID utilisateur associé au paiement : %s", user_id)
 
-        return Response({"message": "Webhook received"}, status=200)
+            if user_id:
+                try:
+                    user = User.objects.get(id=user_id)
+                    cart = Cart.objects.get(user=user)
+                    if cart.items.exists():
+                        order = Order.objects.create(user=user, status='paid', total_price=0)
+                        total_price = 0
+                        for item in cart.items.all():
+                            if item.quantity > item.product.stock or not item.product.is_available:
+                                continue
+                            OrderItem.objects.create(
+                                order=order,
+                                product=item.product,
+                                quantity=item.quantity,
+                                price_per_unit=item.product.price,
+                            )
+                            item.product.stock -= item.quantity
+                            item.product.save()
+                            total_price += item.quantity * item.product.price
+                        order.total_price = total_price
+                        order.save()
+                        cart.items.all().delete()
+                        logger.info("✅ Commande créée automatiquement depuis webhook.")
+                except Exception as e:
+                    logger.error("❌ Erreur création commande via webhook : %s", str(e))
+                    return Response({"error": str(e)}, status=500)
+
+        return Response({"message": "Webhook handled"}, status=200)
+
 
 
 class AdminOrderActionsView(APIView):
