@@ -109,6 +109,7 @@ class StripeWebhookView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
+        print("🔔 Webhook Stripe reçu - Début traitement POST")
         logger.info("✅ StripeWebhookView POST reçu")
 
         payload = request.body
@@ -162,7 +163,6 @@ class StripeWebhookView(APIView):
                     return Response({"error": str(e)}, status=500)
 
         return Response({"message": "Webhook handled"}, status=200)
-
 
 
 class AdminOrderActionsView(APIView):

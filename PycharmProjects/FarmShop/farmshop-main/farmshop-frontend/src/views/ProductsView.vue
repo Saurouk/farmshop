@@ -15,18 +15,28 @@
               <p class="text-muted">{{ product.category }}</p>
               <p class="fw-bold text-success">{{ product.price }} €</p>
               <p class="text-muted">Stock : {{ product.stock }} {{ product.unit_of_measure }}</p>
+              <p v-if="product.is_rentable" class="text-success small">Disponible à la location ✅</p>
             </div>
           </router-link>
 
-          <div class="d-flex align-items-center gap-2 px-3 pb-3">
-            <input
-              type="number"
-              min="1"
-              :max="product.stock"
-              v-model.number="quantities[product.id]"
-              class="form-control form-control-sm w-50"
-            />
-            <button class="btn btn-sm btn-primary" @click="addToCart(product.id)">Ajouter au panier</button>
+          <div class="d-flex flex-column align-items-start gap-2 px-3 pb-3">
+            <div class="d-flex w-100 gap-2">
+              <input
+                type="number"
+                min="1"
+                :max="product.stock"
+                v-model.number="quantities[product.id]"
+                class="form-control form-control-sm w-50"
+              />
+              <button class="btn btn-sm btn-primary" @click="addToCart(product.id)">Ajouter au panier</button>
+            </div>
+            <router-link
+              v-if="product.is_rentable"
+              :to="`/rentals/payment/${product.id}`"
+              class="btn btn-sm btn-outline-primary w-100"
+            >
+              Louer ce produit
+            </router-link>
           </div>
         </div>
       </div>

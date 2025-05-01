@@ -54,6 +54,12 @@ const routes = [
     component: () => import('@/views/AdminOrdersView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: '/admin/locations',
+    name: 'LocationAdmin',
+    component: () => import('@/components/LocationAdmin.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
   { path: '/blog', component: BlogView },
   { path: '/blog/:id', component: () => import('@/views/ArticleDetail.vue') },
   { path: '/contact', component: ContactView },
@@ -76,6 +82,18 @@ const routes = [
     name: 'ProductAdmin',
     component: () => import('@/components/ProductAdmin.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/rentals/payment/:productId',
+    name: 'RentalPaymentView',
+    component: () => import('@/views/RentalPaymentView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/rental/confirmation',
+    name: 'RentalConfirmationView',
+    component: () => import('@/views/RentalConfirmationView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

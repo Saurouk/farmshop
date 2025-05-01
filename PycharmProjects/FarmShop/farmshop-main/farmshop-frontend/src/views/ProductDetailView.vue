@@ -26,6 +26,13 @@
         <div class="d-flex mt-4 gap-2">
           <input type="number" min="1" v-model="quantity" class="form-control w-auto" />
           <button class="btn btn-primary" @click="addToCart">Ajouter au panier</button>
+          <router-link
+            v-if="product.is_rentable"
+            :to="`/rentals/payment/${product.id}`"
+            class="btn btn-outline-primary"
+          >
+            Louer ce produit
+          </router-link>
         </div>
       </div>
     </div>

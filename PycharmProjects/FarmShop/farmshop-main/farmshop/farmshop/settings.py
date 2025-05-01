@@ -12,9 +12,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '1aa5-2a02-2788-1028-99f-5ae-8d65-cb4d-b65f.ngrok-free.app',
-    '892a-2a02-2788-1028-99f-b946-6493-88b6-550c.ngrok-free.app',
-    '66f0-2a02-2788-1028-99f-b07a-d54f-2cbd-e565.ngrok-free.app'
+    'c36f-2a02-2788-1028-99f-5c5d-e7ba-690f-df6e.ngrok-free.app'
 ]
 
 INSTALLED_APPS = [

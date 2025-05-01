@@ -1,9 +1,12 @@
 import logging
+import stripe
+from datetime import datetime
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from rest_framework.views import APIView
+from django.conf import settings
 from .models import Product, Rental, Category, Wishlist, ProductImage
 from .serializers import (
     ProductSerializer,
@@ -101,3 +104,52 @@ class WishlistViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CreateRentalPaymentIntentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        product_id = request.data.get("product_id")
+        start_date = request.data.get("start_date")
+        end_date = request.data.get("end_date")
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": "Produit introuvable"}, status=404)
+
+        if not product.is_rentable or not product.stock > 0:
+            return Response({"error": "Produit non disponible à la location"}, status=400)
+
+        try:
+            d1 = datetime.strptime(start_date, "%Y-%m-%d").date()
+            d2 = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({"error": "Dates invalides"}, status=400)
+
+        if d2 <= d1:
+            return Response({"error": "La date de fin doit être après la date de début"}, status=400)
+
+        days = (d2 - d1).days
+        if not hasattr(product, 'daily_price') or not product.daily_price:
+            return Response({"error": "Prix journalier non défini pour ce produit"}, status=400)
+
+        total_amount = int(product.daily_price * days * 100)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=total_amount,
+                currency="usd",
+                metadata={
+                    "user_id": request.user.id,
+                    "product_id": product.id,
+                    "start_date": str(start_date),
+                    "end_date": str(end_date)
+                }
+            )
+            return Response({"client_secret": intent.client_secret})
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
