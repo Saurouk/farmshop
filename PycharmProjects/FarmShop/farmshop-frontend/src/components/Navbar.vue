@@ -49,6 +49,9 @@
           <router-link class="btn btn-outline-light me-2" to="/orders/history">
             <font-awesome-icon icon="receipt" class="me-1" /> Mes commandes
           </router-link>
+          <router-link class="btn btn-outline-light me-2" to="/rentals/history">
+            📅 Mes locations
+          </router-link>
           <router-link class="btn btn-primary me-3" to="/profile">
             <font-awesome-icon icon="user" class="me-1" /> Mon Profil
           </router-link>

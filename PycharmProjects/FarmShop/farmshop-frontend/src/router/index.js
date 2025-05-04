@@ -49,6 +49,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/rentals/history',
+    name: 'RentalHistoryView',
+    component: () => import('@/views/RentalHistoryView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/admin/orders',
     name: 'AdminOrdersView',
     component: () => import('@/views/AdminOrdersView.vue'),

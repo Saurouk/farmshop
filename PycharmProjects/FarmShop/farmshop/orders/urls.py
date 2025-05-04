@@ -6,7 +6,7 @@ from .views import (
     StripeWebhookView,
     AdminOrderActionsView,
     GenerateInvoiceView,
-    AdminListOrdersView
+    AdminListOrdersView, RentalPaymentIntentView, UserRentalHistoryView
 )
 
 urlpatterns = [
@@ -18,4 +18,7 @@ urlpatterns = [
     path('admin/orders/', AdminListOrdersView.as_view(), name='admin-list-orders'),
     path('create-payment-intent/', CreateStripePaymentIntentView.as_view(), name='create-payment-intent'),
     path('stripe-webhook/', StripeWebhookView.as_view(), name='stripe-webhook'),
+    path('create-rental-payment-intent/', RentalPaymentIntentView.as_view(), name='rental-payment-intent'),
+    path('rentals/my/', UserRentalHistoryView.as_view(), name='user-rental-history'),
+
 ]
