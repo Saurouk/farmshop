@@ -1,5 +1,3 @@
-# products/serializers.py
-
 from rest_framework import serializers
 from .models import Product, Rental, Category, Wishlist, ProductImage, UNIT_CHOICES
 
@@ -39,16 +37,15 @@ class RentalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class WishlistSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-    product_id = serializers.PrimaryKeyRelatedField(
+    product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(),
         write_only=True
     )
+    product_detail = ProductSerializer(source='product', read_only=True)
 
     class Meta:
         model = Wishlist
-        fields = ['id', 'product', 'product_id', 'added_at']
+        fields = ['id', 'product', 'product_detail', 'added_at']
 
     def create(self, validated_data):
-        product = validated_data.pop('product_id')
-        return Wishlist.objects.create(product=product, **validated_data)
+        return Wishlist.objects.create(**validated_data)

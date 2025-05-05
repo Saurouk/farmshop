@@ -37,6 +37,9 @@
             >
               Louer ce produit
             </router-link>
+            <button class="btn btn-sm btn-outline-danger w-100" @click="addToWishlist(product)">
+              💖 Ajouter à la wishlist
+            </button>
           </div>
         </div>
       </div>
@@ -55,7 +58,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
+import { useRouter } from 'vue-router'
 import { fetchCartCount } from '@/stores/cart'
+
+const toast = useToast()
+const router = useRouter()
 
 const products = ref([])
 const quantities = ref({})
@@ -97,6 +105,37 @@ const addToCart = async (productId) => {
   } catch (error) {
     console.error("Erreur ajout au panier :", error)
     alert("Erreur lors de l'ajout au panier.")
+  }
+}
+
+const addToWishlist = async (product) => {
+  const token = localStorage.getItem('access_token')
+  if (!token) {
+    toast.warning("Connectez-vous pour utiliser la wishlist.")
+    router.push('/login')
+    return
+  }
+
+  try {
+    await axios.post('http://127.0.0.1:8000/api/products/wishlist/', {
+      product: product.id
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    toast.success("Ajouté à votre wishlist 💖")
+  } catch (err) {
+    if (err.response?.data?.detail) {
+      toast.info(err.response.data.detail)
+    } else if (err.response?.data?.non_field_errors) {
+      toast.info(err.response.data.non_field_errors[0])
+    } else if (typeof err.response?.data === 'string') {
+      toast.info(err.response.data)
+    } else {
+      toast.error("Erreur lors de l'ajout à la wishlist.")
+    }
   }
 }
 

@@ -9,8 +9,8 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link class="nav-link text-white" active-class="fw-bold" to="/">
               <font-awesome-icon icon="home" class="me-1" /> Accueil
@@ -43,25 +43,30 @@
           </li>
         </ul>
 
-        <CartIcon />
+        <div class="d-flex align-items-center gap-2">
+          <CartIcon />
+          <router-link to="/wishlist" class="btn btn-light position-relative me-2">
+            💖
+          </router-link>
 
-        <div v-if="isAuthenticated" class="user-menu d-flex align-items-center ms-4">
-          <router-link class="btn btn-outline-light me-2" to="/orders/history">
-            <font-awesome-icon icon="receipt" class="me-1" /> Mes commandes
+          <div v-if="isAuthenticated" class="d-flex align-items-center gap-2">
+            <router-link class="btn btn-outline-light btn-sm" to="/orders/history">
+              <font-awesome-icon icon="receipt" class="me-1" /> Commandes
+            </router-link>
+            <router-link class="btn btn-outline-light btn-sm" to="/rentals/history">
+              📅 Locations
+            </router-link>
+            <router-link class="btn btn-primary btn-sm" to="/profile">
+              <font-awesome-icon icon="user" class="me-1" /> Profil
+            </router-link>
+            <span class="text-white fw-bold ms-2">👤 {{ username }}</span>
+            <button @click="logout" class="btn btn-danger btn-sm fw-bold">Déconnexion</button>
+          </div>
+
+          <router-link v-else class="btn btn-warning text-dark fw-bold" to="/login">
+            Connexion
           </router-link>
-          <router-link class="btn btn-outline-light me-2" to="/rentals/history">
-            📅 Mes locations
-          </router-link>
-          <router-link class="btn btn-primary me-3" to="/profile">
-            <font-awesome-icon icon="user" class="me-1" /> Mon Profil
-          </router-link>
-          <span class="text-white fw-bold">👤 {{ username }}</span>
-          <button @click="logout" class="btn btn-danger ms-3 fw-bold">Déconnexion</button>
         </div>
-
-        <router-link v-else class="btn btn-warning text-dark ms-3 fw-bold" to="/login">
-          Connexion
-        </router-link>
       </div>
     </div>
   </nav>
@@ -90,15 +95,10 @@ const logout = () => {
 </script>
 
 <style scoped>
-.user-menu {
-  display: flex;
-  align-items: center;
-}
-
 .custom-navbar {
-  font-size: 1.15rem;
-  padding-top: 1.2rem;
-  padding-bottom: 1.2rem;
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .navbar-brand {
@@ -106,7 +106,6 @@ const logout = () => {
 }
 
 .nav-link {
-  font-size: 1.1rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
 }

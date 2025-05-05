@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+from django.db import IntegrityError
 from django.conf import settings
 from .models import Product, Rental, Category, Wishlist, ProductImage
 from .serializers import (
@@ -103,7 +105,27 @@ class WishlistViewSet(viewsets.ModelViewSet):
         return Wishlist.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        try:
+            instance = serializer.save(user=self.request.user)
+            print(f"✅ Wishlist item créé : {instance}")
+        except IntegrityError:
+            print(f"❌ Produit déjà dans la wishlist.")
+            raise ValidationError({"non_field_errors": ["Vous avez déjà ajouté ce produit à votre wishlist."]})
+        except Exception as e:
+            print(f"❌ Erreur inattendue dans perform_create: {e}")
+            raise ValidationError({"detail": str(e)})
+
+
+class RemoveFromWishlistView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, product_id):
+        try:
+            wishlist_item = Wishlist.objects.get(user=request.user, product__id=product_id)
+            wishlist_item.delete()
+            return Response({"message": "Produit retiré de la wishlist."}, status=204)
+        except Wishlist.DoesNotExist:
+            return Response({"error": "Produit non trouvé dans votre wishlist."}, status=404)
 
 
 class CreateRentalPaymentIntentView(APIView):

@@ -23,7 +23,7 @@
           </span>
         </div>
 
-        <div class="d-flex mt-4 gap-2">
+        <div class="d-flex mt-4 gap-2 flex-wrap">
           <input type="number" min="1" v-model="quantity" class="form-control w-auto" />
           <button class="btn btn-primary" @click="addToCart">Ajouter au panier</button>
           <router-link
@@ -33,6 +33,13 @@
           >
             Louer ce produit
           </router-link>
+          <button
+            class="btn"
+            :class="isInWishlist ? 'btn-danger' : 'btn-outline-danger'"
+            @click="toggleWishlist"
+          >
+            {{ isInWishlist ? '💔 Retirer de la wishlist' : '💖 Ajouter à la wishlist' }}
+          </button>
         </div>
       </div>
     </div>
@@ -64,6 +71,7 @@ const lightboxIndex = ref(0)
 const token = localStorage.getItem('access_token')
 const isLoggedIn = !!token
 const toast = useToast()
+const isInWishlist = ref(false)
 
 const showLightbox = (index) => {
   lightboxIndex.value = index
@@ -93,11 +101,52 @@ const addToCart = async () => {
   }
 }
 
+const checkWishlist = async () => {
+  if (!isLoggedIn) return
+  try {
+    const res = await axios.get('http://127.0.0.1:8000/api/products/wishlist/', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    isInWishlist.value = res.data.results?.some(item => item.product_detail.id === product.value.id)
+  } catch (err) {
+    console.error('Erreur vérification wishlist', err)
+  }
+}
+
+const toggleWishlist = async () => {
+  if (!isLoggedIn) {
+    toast.warning('Veuillez vous connecter pour utiliser la wishlist.')
+    return
+  }
+
+  try {
+    if (isInWishlist.value) {
+      await axios.delete(`http://127.0.0.1:8000/api/products/wishlist/${product.value.id}/remove/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      isInWishlist.value = false
+      toast.info('Produit retiré de votre wishlist.')
+    } else {
+      await axios.post('http://127.0.0.1:8000/api/products/wishlist/', {
+        product: product.value.id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      isInWishlist.value = true
+      toast.success('Produit ajouté à votre wishlist.')
+    }
+  } catch (err) {
+    console.error('Erreur wishlist', err)
+    toast.error('Action wishlist échouée.')
+  }
+}
+
 onMounted(async () => {
   try {
     const productId = route.params.id
     const response = await axios.get(`http://127.0.0.1:8000/api/products/${productId}/`)
     product.value = response.data
+    checkWishlist()
   } catch (error) {
     console.error('❌ Erreur API:', error)
   }
