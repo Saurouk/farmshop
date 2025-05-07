@@ -1,35 +1,77 @@
 <template>
-  <div class="profile-container">
-    <h2>👤 Mon Profil</h2>
-
-    <div v-if="user" class="profile-info">
-      <!-- Image de profil -->
-      <img :src="user.profile_picture ? 'http://127.0.0.1:8000' + user.profile_picture : defaultAvatar" alt="Photo de profil" class="profile-pic">
-
-      <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
-      <p><strong>Email :</strong> {{ user.email }}</p>
-
-      <!-- Formulaire d'upload d'une nouvelle photo de profil -->
-      <input type="file" @change="uploadProfilePicture" />
-
-      <h3>📩 Boîte de réception</h3>
-      <ul v-if="messages.length">
-        <li v-for="msg in messages" :key="msg.id">
-          <strong>{{ msg.sender }}:</strong> {{ msg.content }}
-          <span v-if="!msg.is_read" class="unread">🔵 Non lu</span>
-        </li>
-      </ul>
-      <p v-else>Aucun message reçu.</p>
-
-      <h3>📩 Contacter l'admin</h3>
-      <p>Admin : <strong>{{ user.admin_contact.username }}</strong></p>
-      <p>Email : <a :href="'mailto:' + user.admin_contact.email">{{ user.admin_contact.email }}</a></p>
-
-      <textarea v-model="messageContent" placeholder="Écrire un message"></textarea>
-      <button class="contact-admin" @click="contactAdmin">✉️ Envoyer</button>
+  <div class="container py-5">
+    <div v-if="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
     </div>
 
-    <div v-else class="loading">Chargement du profil...</div>
+    <div v-else class="profile-wrapper shadow p-4 rounded bg-white">
+      <div class="d-flex align-items-center gap-4 mb-4">
+        <img
+          :src="user.profile_picture ? 'http://127.0.0.1:8000' + user.profile_picture : defaultAvatar"
+          class="rounded-circle profile-pic"
+          alt="avatar"
+        />
+        <div>
+          <h4 class="mb-1">{{ user.username }}</h4>
+          <p class="text-muted mb-0">{{ user.email }}</p>
+          <label class="btn btn-sm btn-outline-primary mt-2">
+            Modifier la photo
+            <input type="file" hidden @change="uploadProfilePicture" />
+          </label>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">📥 Messages reçus</h5>
+          <button class="btn btn-sm btn-outline-secondary" @click="toggleInbox">
+            {{ showInbox ? 'Masquer' : 'Afficher' }}
+          </button>
+        </div>
+
+        <div v-if="showInbox && messages.length" class="message-list">
+          <div
+            v-for="msg in messages"
+            :key="msg.id"
+            class="message-box p-3 mb-2 border rounded"
+            @click="markAsRead(msg)"
+            style="cursor: pointer;"
+          >
+            <div class="d-flex justify-content-between">
+              <strong>{{ msg.sender }}</strong>
+              <span class="text-muted small">{{ formatDate(msg.created_at) }}</span>
+            </div>
+            <p class="mb-0">{{ msg.content }}</p>
+            <span v-if="!msg.is_read" class="badge bg-info text-dark mt-1">Non lu</span>
+            <div v-if="msg.attachment" class="mt-2">
+              <a
+                :href="msg.attachment"
+                class="btn btn-sm btn-outline-secondary"
+                target="_blank"
+              >
+                📌 Télécharger la pièce jointe
+              </a>
+            </div>
+          </div>
+        </div>
+        <p v-else-if="showInbox" class="text-muted">Aucun message reçu.</p>
+      </div>
+
+      <hr />
+
+      <div class="section">
+        <h5>📨 Contacter l'admin</h5>
+        <p class="mb-1">Admin : <strong>{{ user.admin_contact?.username }}</strong></p>
+        <p class="mb-2">Email : <a :href="'mailto:' + user.admin_contact?.email">{{ user.admin_contact?.email }}</a></p>
+        <textarea class="form-control mb-2" v-model="messageContent" rows="3" placeholder="Votre message..."></textarea>
+        <input type="file" @change="handleAttachment" class="form-control mb-2" />
+        <button class="btn btn-primary" @click="contactAdmin">Envoyer</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -39,42 +81,53 @@ import axios from 'axios'
 
 const user = ref(null)
 const messages = ref([])
-const messageContent = ref("")
+const loading = ref(true)
+const messageContent = ref('')
+const attachment = ref(null)
 const defaultAvatar = '/default-avatar.png'
+const showInbox = ref(true)
 
-onMounted(async () => {
+const toggleInbox = () => {
+  showInbox.value = !showInbox.value
+}
+
+const fetchProfile = async () => {
+  const token = localStorage.getItem('access_token')
+  const headers = { Authorization: `Bearer ${token}` }
   try {
-    const token = localStorage.getItem('access_token')
-
-    // Récupérer les infos de l'utilisateur
-    const response = await axios.get('http://127.0.0.1:8000/api/users/me/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    user.value = response.data
-
-    // Récupérer les messages reçus
-    const messagesResponse = await axios.get('http://127.0.0.1:8000/api/users/messages/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    messages.value = messagesResponse.data
-  } catch (error) {
-    console.error('❌ Erreur lors du chargement du profil :', error)
+    const resUser = await axios.get('http://127.0.0.1:8000/api/users/me/', { headers })
+    const resMessages = await axios.get('http://127.0.0.1:8000/api/users/messages/', { headers })
+    user.value = resUser.data
+    messages.value = resMessages.data.results || resMessages.data
+  } catch (err) {
+    console.error('Erreur chargement du profil :', err)
+  } finally {
+    loading.value = false
   }
-})
+}
 
 const contactAdmin = async () => {
+  const token = localStorage.getItem('access_token')
+  const formData = new FormData()
+  formData.append('recipient', user.value.admin_contact.username)
+  formData.append('content', messageContent.value)
+  if (attachment.value) {
+    formData.append('attachment', attachment.value)
+  }
+
   try {
-    const token = localStorage.getItem('access_token')
-    await axios.post('http://127.0.0.1:8000/api/users/messages/', {
-      recipient: user.value.admin_contact.username,
-      content: messageContent.value
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
+    await axios.post('http://127.0.0.1:8000/api/users/messages/', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
     })
-    alert("📨 Message envoyé à l'admin !")
-    messageContent.value = ""
-  } catch (error) {
-    console.error("❌ Erreur lors de l'envoi du message :", error)
+    messageContent.value = ''
+    attachment.value = null
+    fetchProfile()
+    alert('Message envoyé à l\'admin.')
+  } catch (err) {
+    console.error('Erreur envoi message :', err)
   }
 }
 
@@ -84,58 +137,63 @@ const uploadProfilePicture = async (event) => {
 
   const formData = new FormData()
   formData.append('profile_picture', file)
+  const token = localStorage.getItem('access_token')
 
   try {
-    const token = localStorage.getItem('access_token')
     await axios.patch('http://127.0.0.1:8000/api/users/me/', formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
       }
     })
-    alert("📸 Photo de profil mise à jour !")
-    location.reload()
-  } catch (error) {
-    console.error("❌ Erreur lors de l'upload :", error)
+    fetchProfile()
+  } catch (err) {
+    console.error('Erreur upload photo :', err)
   }
 }
+
+const markAsRead = async (msg) => {
+  if (msg.is_read) return
+
+  const token = localStorage.getItem('access_token')
+  try {
+    await axios.patch(`http://127.0.0.1:8000/api/users/messages/${msg.id}/`, {
+      is_read: true
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    msg.is_read = true
+  } catch (err) {
+    console.error('Erreur mise à jour lecture message :', err)
+  }
+}
+
+const handleAttachment = (e) => {
+  attachment.value = e.target.files[0]
+}
+
+const formatDate = (str) => new Date(str).toLocaleString()
+
+onMounted(fetchProfile)
 </script>
 
 <style scoped>
-.profile-container {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 20px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  text-align: center;
+.profile-wrapper {
+  max-width: 700px;
+  margin: auto;
 }
-
-.profile-info p {
-  font-size: 1.2rem;
-}
-
 .profile-pic {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  margin-bottom: 10px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
+  border: 2px solid #ccc;
 }
-
-.contact-admin, input[type="file"] {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.message-box {
+  background-color: #f8f9fa;
 }
-
-.contact-admin:hover {
-  background: #0056b3;
+.section {
+  margin-top: 2rem;
 }
 </style>

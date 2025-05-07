@@ -1,14 +1,32 @@
 <template>
-  <div class="container">
+  <div class="container py-5">
     <h2>📩 Boîte de Réception</h2>
-    <div v-if="messages.length">
-      <div v-for="message in messages" :key="message.id" class="message-card">
-        <p><strong>De :</strong> {{ message.sender.username }}</p>
-        <p>{{ message.content }}</p>
-        <p class="text-muted">{{ new Date(message.created_at).toLocaleString() }}</p>
+
+    <div v-if="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
       </div>
     </div>
-    <p v-else>Aucun message reçu.</p>
+
+    <div v-else>
+      <div v-if="messages.length">
+        <div v-for="message in messages" :key="message.id" class="message-card">
+          <p><strong>De :</strong> {{ message.sender }}</p>
+          <p>{{ message.content }}</p>
+          <p class="text-muted small">{{ formatDate(message.created_at) }}</p>
+          <div v-if="message.attachment" class="mt-2">
+            <a
+              :href="'http://127.0.0.1:8000' + message.attachment"
+              class="btn btn-sm btn-outline-secondary"
+              target="_blank"
+            >
+              📎 Pièce jointe
+            </a>
+          </div>
+        </div>
+      </div>
+      <p v-else>Aucun message reçu.</p>
+    </div>
   </div>
 </template>
 
@@ -17,8 +35,9 @@ import { ref, onMounted } from "vue";
 import axios from "axios";
 
 const messages = ref([]);
+const loading = ref(true);
 
-onMounted(async () => {
+const fetchMessages = async () => {
   try {
     const response = await axios.get("http://127.0.0.1:8000/api/users/messages/", {
       headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
@@ -26,8 +45,14 @@ onMounted(async () => {
     messages.value = response.data;
   } catch (error) {
     console.error("❌ Erreur lors du chargement des messages :", error);
+  } finally {
+    loading.value = false;
   }
-});
+};
+
+const formatDate = (str) => new Date(str).toLocaleString();
+
+onMounted(fetchMessages);
 </script>
 
 <style scoped>
