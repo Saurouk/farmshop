@@ -9,7 +9,7 @@
     <div v-else class="profile-wrapper shadow p-4 rounded bg-white">
       <div class="d-flex align-items-center gap-4 mb-4">
         <img
-          :src="user.profile_picture ? 'http://127.0.0.1:8000' + user.profile_picture : defaultAvatar"
+          :src="user.profile_picture ? user.profile_picture : defaultAvatar"
           class="rounded-circle profile-pic"
           alt="avatar"
         />
@@ -27,8 +27,8 @@
 
       <div class="section">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h5 class="mb-0">📥 Messages reçus</h5>
-          <button class="btn btn-sm btn-outline-secondary" @click="toggleInbox">
+          <h5>📬 Messages reçus</h5>
+          <button class="btn btn-sm btn-outline-secondary" @click="showInbox = !showInbox">
             {{ showInbox ? 'Masquer' : 'Afficher' }}
           </button>
         </div>
@@ -63,33 +63,32 @@
 
       <hr />
 
-      <div class="section">
-        <h5>📨 Contacter l'admin</h5>
-        <p class="mb-1">Admin : <strong>{{ user.admin_contact?.username }}</strong></p>
-        <p class="mb-2">Email : <a :href="'mailto:' + user.admin_contact?.email">{{ user.admin_contact?.email }}</a></p>
-        <textarea class="form-control mb-2" v-model="messageContent" rows="3" placeholder="Votre message..."></textarea>
-        <input type="file" @change="handleAttachment" class="form-control mb-2" />
-        <button class="btn btn-primary" @click="contactAdmin">Envoyer</button>
+      <div class="section text-center">
+        <button class="btn btn-outline-primary" @click="showModal = true">
+          📨 Contacter l'admin
+        </button>
       </div>
     </div>
+
+    <ContactAdminModal
+      :visible="showModal"
+      :admin-username="user?.admin_contact?.username"
+      @close="showModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import ContactAdminModal from '@/components/ContactAdminModal.vue'
 
 const user = ref(null)
 const messages = ref([])
 const loading = ref(true)
-const messageContent = ref('')
-const attachment = ref(null)
 const defaultAvatar = '/default-avatar.png'
+const showModal = ref(false)
 const showInbox = ref(true)
-
-const toggleInbox = () => {
-  showInbox.value = !showInbox.value
-}
 
 const fetchProfile = async () => {
   const token = localStorage.getItem('access_token')
@@ -103,31 +102,6 @@ const fetchProfile = async () => {
     console.error('Erreur chargement du profil :', err)
   } finally {
     loading.value = false
-  }
-}
-
-const contactAdmin = async () => {
-  const token = localStorage.getItem('access_token')
-  const formData = new FormData()
-  formData.append('recipient', user.value.admin_contact.username)
-  formData.append('content', messageContent.value)
-  if (attachment.value) {
-    formData.append('attachment', attachment.value)
-  }
-
-  try {
-    await axios.post('http://127.0.0.1:8000/api/users/messages/', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    messageContent.value = ''
-    attachment.value = null
-    fetchProfile()
-    alert('Message envoyé à l\'admin.')
-  } catch (err) {
-    console.error('Erreur envoi message :', err)
   }
 }
 
@@ -168,10 +142,6 @@ const markAsRead = async (msg) => {
   } catch (err) {
     console.error('Erreur mise à jour lecture message :', err)
   }
-}
-
-const handleAttachment = (e) => {
-  attachment.value = e.target.files[0]
 }
 
 const formatDate = (str) => new Date(str).toLocaleString()

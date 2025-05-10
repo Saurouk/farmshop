@@ -48,11 +48,23 @@
       <div class="mb-3">
         <label class="form-label fw-bold">Image principale</label>
         <input type="file" class="form-control" @change="handleImage" />
+        <div v-if="form.image_url" class="mt-2">
+          <img :src="form.image_url" alt="Image actuelle" class="img-thumbnail mb-2" style="max-width: 200px;" />
+          <button class="btn btn-sm btn-outline-danger" @click="deleteMainImage">
+            Supprimer l’image principale
+          </button>
+        </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label fw-bold">Images de la galerie</label>
         <input type="file" class="form-control" multiple @change="handleGallery" />
+        <div class="mt-2 d-flex flex-wrap gap-3">
+          <div v-for="img in form.gallery_urls" :key="img.id" class="text-center">
+            <img :src="img.image" class="img-thumbnail" style="max-width: 100px;" />
+            <button class="btn btn-sm btn-outline-danger mt-1" @click="deleteGalleryImage(img.id)">❌</button>
+          </div>
+        </div>
       </div>
 
       <div class="d-flex justify-content-end gap-2">
@@ -85,7 +97,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const products = ref([])
 const categories = ref([])
 const gallery = ref([])
@@ -96,7 +110,8 @@ const editingId = ref(null)
 const form = ref({
   name: '', description: '', price: 0, stock: 0,
   unit_of_measure: 'piece', is_rentable: false,
-  category_id: '', image: null
+  category_id: '', image: null, image_url: null,
+  gallery_urls: []
 })
 
 const token = localStorage.getItem('access_token')
@@ -133,12 +148,12 @@ const handleGallery = (e) => {
 const submitForm = async () => {
   const formData = new FormData()
   for (const key in form.value) {
-    if (form.value[key] !== null) {
+    if (key !== 'gallery_urls' && key !== 'image_url' && form.value[key] !== null) {
       formData.append(key, form.value[key])
     }
   }
   gallery.value.forEach(file => {
-    formData.append('gallery', file)
+    formData.append('images_upload', file)
   })
 
   try {
@@ -155,7 +170,7 @@ const submitForm = async () => {
     fetchProducts()
   } catch (err) {
     console.error("❌ Erreur envoi produit :", err)
-    alert("Erreur lors de l'enregistrement.")
+    toast.error("Erreur lors de l'enregistrement.")
   }
 }
 
@@ -168,18 +183,43 @@ const editProduct = (p) => {
     unit_of_measure: p.unit_of_measure,
     is_rentable: p.is_rentable,
     category_id: p.category_id,
-    image: null
+    image: null,
+    image_url: p.image,
+    gallery_urls: p.images || []
   }
   editingId.value = p.id
   showForm.value = true
   editMode.value = true
 }
 
+const deleteMainImage = async () => {
+  if (!editingId.value) return
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/products/${editingId.value}/delete-main-image/`, { headers })
+    form.value.image_url = null
+    toast.info("Image principale supprimée.")
+  } catch (err) {
+    console.error("❌ Erreur suppression image principale :", err)
+    toast.error("Erreur suppression image principale.")
+  }
+}
+
+const deleteGalleryImage = async (imgId) => {
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/products/images/${imgId}/`, { headers })
+    form.value.gallery_urls = form.value.gallery_urls.filter(img => img.id !== imgId)
+    toast.info("Image supprimée.")
+  } catch (err) {
+    console.error("❌ Erreur suppression image :", err)
+    toast.error("Erreur suppression image.")
+  }
+}
+
 const resetForm = () => {
   form.value = {
     name: '', description: '', price: 0, stock: 0,
     unit_of_measure: 'piece', is_rentable: false,
-    category_id: '', image: null
+    category_id: '', image: null, image_url: null, gallery_urls: []
   }
   editingId.value = null
   showForm.value = false

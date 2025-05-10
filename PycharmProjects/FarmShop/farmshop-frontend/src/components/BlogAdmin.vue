@@ -20,7 +20,12 @@
 
       <div v-if="createMode || editingArticle" class="card card-body shadow-sm mb-4">
         <input v-model="form.title" class="form-control mb-2" placeholder="Titre de l'article" />
-        <textarea v-model="form.content" class="form-control mb-2" rows="4" placeholder="Contenu..."></textarea>
+        <textarea v-model="form.content" class="form-control mb-2" rows="6" placeholder="Contenu HTML..."></textarea>
+        <input type="file" class="form-control mb-2" @change="handleThumbnail" />
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" v-model="form.is_published" id="pubCheck" />
+          <label class="form-check-label" for="pubCheck">Publié</label>
+        </div>
         <div class="d-flex justify-content-end gap-2">
           <button @click="submitForm" class="btn btn-primary">{{ editingArticle ? 'Mettre à jour' : 'Publier' }}</button>
           <button @click="resetForm" class="btn btn-outline-secondary">Annuler</button>
@@ -68,7 +73,7 @@
       </div>
     </div>
 
-    <!-- SIGNALEMENTS EN ATTENTE -->
+    <!-- SIGNALEMENTS -->
     <div v-if="activeSection === 'reports'">
       <h3>Signalements en attente</h3>
       <ul class="list-group">
@@ -119,7 +124,7 @@ const comments = ref([])
 const reports = ref([])
 const resolvedReports = ref([])
 
-const form = ref({ title: '', content: '' })
+const form = ref({ title: '', content: '', is_published: true, thumbnail: null })
 const createMode = ref(false)
 const editingArticle = ref(null)
 
@@ -169,12 +174,29 @@ const showCreateForm = () => {
   createMode.value = true
 }
 
+const handleThumbnail = (e) => {
+  const file = e.target.files[0]
+  if (file) form.value.thumbnail = file
+}
+
 const submitForm = async () => {
+  const formData = new FormData()
+  formData.append('title', form.value.title)
+  formData.append('content', form.value.content)
+  formData.append('is_published', form.value.is_published)
+  if (form.value.thumbnail) {
+    formData.append('thumbnail', form.value.thumbnail)
+  }
+
   try {
     if (editingArticle.value) {
-      await axios.put(`http://127.0.0.1:8000/api/blog/articles/${editingArticle.value.id}/`, form.value, { headers })
+      await axios.put(`http://127.0.0.1:8000/api/blog/articles/${editingArticle.value.id}/`, formData, {
+        headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+      })
     } else {
-      await axios.post("http://127.0.0.1:8000/api/blog/articles/", form.value, { headers })
+      await axios.post("http://127.0.0.1:8000/api/blog/articles/", formData, {
+        headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+      })
     }
     resetForm()
     fetchAll()
@@ -185,12 +207,17 @@ const submitForm = async () => {
 
 const editArticle = (article) => {
   editingArticle.value = article
-  form.value = { title: article.title, content: article.content }
+  form.value = {
+    title: article.title,
+    content: article.content,
+    is_published: article.is_published,
+    thumbnail: null
+  }
   createMode.value = false
 }
 
 const resetForm = () => {
-  form.value = { title: '', content: '' }
+  form.value = { title: '', content: '', is_published: true, thumbnail: null }
   createMode.value = false
   editingArticle.value = null
 }

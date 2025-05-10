@@ -4,18 +4,25 @@
     <p>Découvrez nos actualités, conseils et infos agricoles.</p>
 
     <div v-if="articles.length">
-      <div v-for="article in articles" :key="article.id" class="card my-3">
-        <div class="card-body">
-          <h3 class="card-title">{{ article.title }}</h3>
-          <p class="card-subtitle text-muted">
-            Par {{ article.author }} – {{ formatDate(article.created_at) }}
-          </p>
-          <p class="card-text mt-2">
-            {{ getExcerpt(article.content) }}...
-          </p>
-          <router-link :to="`/blog/${article.id}`" class="btn btn-outline-primary">
-            Lire l'article →
-          </router-link>
+      <div v-for="article in articles" :key="article.id" class="card my-4 shadow-sm blog-card">
+        <div class="row g-0">
+          <div class="col-md-4" v-if="article.thumbnail">
+            <img :src="article.thumbnail" class="img-fluid rounded-start h-100 w-100 object-cover" alt="vignette" />
+          </div>
+          <div :class="article.thumbnail ? 'col-md-8' : 'col-12'">
+            <div class="card-body">
+              <h3 class="card-title">{{ article.title }}</h3>
+              <p class="card-subtitle text-muted mb-1">
+                Par {{ article.author }} – {{ formatDate(article.created_at) }}
+              </p>
+              <p class="card-text mt-2">
+                {{ getExcerpt(article.content) }}...
+              </p>
+              <router-link :to="`/blog/${article.id}`" class="btn btn-outline-primary">
+                Lire l'article →
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -67,7 +74,10 @@ const prevPage = () => {
 onMounted(fetchArticles)
 
 const getExcerpt = (text, length = 150) => {
-  return text.length > length ? text.slice(0, length) : text
+  const el = document.createElement('div')
+  el.innerHTML = text
+  const plainText = el.textContent || el.innerText || ''
+  return plainText.length > length ? plainText.slice(0, length) : plainText
 }
 
 const formatDate = (dateString) => {
@@ -78,10 +88,11 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
-.card {
-  border: 1px solid #ccc;
+.blog-card {
+  overflow: hidden;
+  border-radius: 10px;
 }
-.card-title {
-  font-weight: bold;
+.object-cover {
+  object-fit: cover;
 }
 </style>

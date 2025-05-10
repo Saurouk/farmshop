@@ -27,8 +27,8 @@ def blog_root_redirect(request):
     return Response(serializer.data)
 
 urlpatterns = [
-    path('', blog_root_redirect, name='blog-root'),  # 👈 Redirige /api/blog/ ici
-    path('', include(router.urls)),  # Toutes les autres routes restent actives
+    path('', blog_root_redirect, name='blog-root'),
+    path('', include(router.urls)),
     path('admin/reported-comments/', list_reported_comments, name='reported-comments'),
     path('admin/delete-comment/<int:comment_id>/', delete_reported_comment, name='delete-comment'),
     path('admin/ignore-report/<int:comment_id>/', ignore_report, name='ignore-report'),

@@ -2,10 +2,11 @@ import logging
 import stripe
 from datetime import datetime
 from rest_framework import viewsets, permissions, status, filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 from django.conf import settings
@@ -37,9 +38,6 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         product = serializer.save()
-        gallery_files = request.FILES.getlist('gallery')
-        for file in gallery_files:
-            ProductImage.objects.create(product=product, image=file)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -48,9 +46,6 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         product = serializer.save()
-        gallery_files = request.FILES.getlist('gallery')
-        for file in gallery_files:
-            ProductImage.objects.create(product=product, image=file)
         return Response(serializer.data)
 
 
@@ -175,3 +170,25 @@ class CreateRentalPaymentIntentView(APIView):
             return Response({"client_secret": intent.client_secret})
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+#  suppression image secondaire
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_product_image(request, pk):
+    try:
+        image = ProductImage.objects.get(pk=pk)
+        image.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except ProductImage.DoesNotExist:
+        return Response({'error': 'Image non trouvée'}, status=status.HTTP_404_NOT_FOUND)
+
+# suppression image principale
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_main_image(request, product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+        product.image.delete(save=True)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Product.DoesNotExist:
+        return Response({'error': 'Produit non trouvé'}, status=status.HTTP_404_NOT_FOUND)

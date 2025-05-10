@@ -9,9 +9,16 @@
         <p class="badge bg-light text-dark">{{ product.unit_of_measure }}</p>
         <p class="mt-3 product-description">{{ product.description }}</p>
 
-        <div class="gallery row mt-4">
-          <div v-for="(img, index) in product.images" :key="index" class="col-md-3 mb-3" @click="showLightbox(index)" style="cursor: pointer;">
-            <img :src="img.image" class="img-fluid rounded shadow-sm" />
+        <!-- Galerie des images secondaires -->
+        <div v-if="product.images && product.images.length" class="gallery row mt-4">
+          <div
+            v-for="(img, index) in product.images"
+            :key="img.id"
+            class="col-md-3 mb-3"
+            @click="showLightbox(index)"
+            style="cursor: pointer;"
+          >
+            <img :src="img.image" class="img-fluid rounded shadow-sm gallery-image" />
           </div>
         </div>
 
@@ -175,5 +182,9 @@ onMounted(async () => {
   font-size: 1.1rem;
   color: #444;
   line-height: 1.6;
+}
+.gallery-image {
+  height: 120px;
+  object-fit: cover;
 }
 </style>

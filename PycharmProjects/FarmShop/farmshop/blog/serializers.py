@@ -13,14 +13,15 @@ class CommentSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     comments_count = serializers.IntegerField(source='comments.count', read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)  # ✅ Inclure les commentaires liés à l'article
+    comments = CommentSerializer(many=True, read_only=True)
+    thumbnail = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Article
         fields = [
             'id', 'title', 'content', 'author',
             'created_at', 'updated_at', 'is_published',
-            'comments_count', 'comments'
+            'comments_count', 'comments', 'thumbnail'
         ]
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -29,4 +30,4 @@ class ReportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Report
-        fields = ['id', 'reporter', 'reported_comment', 'reason', 'created_at',]
+        fields = ['id', 'reporter', 'reported_comment', 'reason', 'created_at']

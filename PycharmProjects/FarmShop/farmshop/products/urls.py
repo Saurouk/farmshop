@@ -6,7 +6,8 @@ from .views import (
     CategoryViewSet,
     WishlistViewSet,
     CreateRentalPaymentIntentView,
-    RemoveFromWishlistView
+    RemoveFromWishlistView, delete_main_image, delete_product_image
+
 )
 
 router = DefaultRouter()
@@ -19,4 +20,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('rental-payment-intent/', CreateRentalPaymentIntentView.as_view(), name='rental-payment-intent'),
     path('wishlist/<int:product_id>/remove/', RemoveFromWishlistView.as_view(), name='wishlist-remove'),
+    path('images/<int:pk>/', delete_product_image),
+    path('<int:product_id>/delete-main-image/', delete_main_image),
 ]

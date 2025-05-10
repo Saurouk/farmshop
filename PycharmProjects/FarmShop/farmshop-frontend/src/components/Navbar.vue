@@ -54,7 +54,7 @@
               <font-awesome-icon icon="receipt" class="me-1" /> Commandes
             </router-link>
             <router-link class="btn btn-outline-light btn-sm" to="/rentals/history">
-              📅 Locations
+              🗕 Locations
             </router-link>
             <router-link class="btn btn-primary btn-sm" to="/profile">
               <font-awesome-icon icon="user" class="me-1" /> Profil

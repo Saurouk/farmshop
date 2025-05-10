@@ -1,8 +1,8 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, serializers
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 import logging
 
 from .models import Article, Comment, Report
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all().order_by('-created_at')
     serializer_class = ArticleSerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -21,7 +22,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
@@ -43,12 +43,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             user = self.request.user
-            logger.info(f"\ud83d\udcac Creating comment by user: {user.username} (is_staff={user.is_staff})")
+            logger.info(f"🗨️ Creating comment by user: {user.username} (is_staff={user.is_staff})")
             serializer.save(user=user)
         except Exception as e:
-            logger.error(f"\u274c Error creating comment: {str(e)}")
+            logger.error(f"❌ Error creating comment: {str(e)}")
             raise
-
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all().order_by('-created_at')
@@ -77,14 +76,12 @@ class ReportViewSet(viewsets.ModelViewSet):
             return Response({"message": "Comment deleted and report resolved."}, status=200)
         return Response({"error": "Commentaire non trouvé."}, status=404)
 
-
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def list_reported_comments(request):
     reported_comments = Comment.objects.filter(report__isnull=False, report__resolved=False)
     serializer = CommentSerializer(reported_comments, many=True)
     return Response(serializer.data)
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
@@ -95,7 +92,6 @@ def delete_reported_comment(request, comment_id):
         return Response({"message": "Commentaire supprimé avec succès."}, status=200)
     except Comment.DoesNotExist:
         return Response({"error": "Commentaire non trouvé."}, status=404)
-
 
 @api_view(['PATCH'])
 @permission_classes([IsAdminUser])

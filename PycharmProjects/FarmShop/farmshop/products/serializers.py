@@ -22,14 +22,34 @@ class ProductSerializer(serializers.ModelSerializer):
     is_available = serializers.ReadOnlyField()
     image = serializers.ImageField(required=False, allow_null=True)
     images = ProductImageSerializer(many=True, read_only=True)
+    images_upload = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True,
+        required=False
+    )
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'stock',
             'low_stock_threshold', 'is_available', 'category_id',
-            'category', 'unit_of_measure', 'image', 'images', 'is_rentable'
+            'category', 'unit_of_measure', 'image', 'images',
+            'images_upload', 'is_rentable'
         ]
+
+    def create(self, validated_data):
+        images_data = validated_data.pop('images_upload', [])
+        product = super().create(validated_data)
+        for img in images_data:
+            ProductImage.objects.create(product=product, image=img)
+        return product
+
+    def update(self, instance, validated_data):
+        images_data = validated_data.pop('images_upload', [])
+        product = super().update(instance, validated_data)
+        for img in images_data:
+            ProductImage.objects.create(product=product, image=img)
+        return product
 
 class RentalSerializer(serializers.ModelSerializer):
     class Meta:
