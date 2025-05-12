@@ -10,6 +10,7 @@ class Article(models.Model):
     is_published = models.BooleanField(default=True)
     is_reported = models.BooleanField(default=False)
     thumbnail = models.ImageField(upload_to="blog/thumbnails/", null=True, blank=True)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_articles', blank=True)
 
     def __str__(self):
         return self.title

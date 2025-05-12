@@ -3,7 +3,7 @@
     <div v-if="article" class="card shadow-sm p-4">
       <div v-if="isEditing">
         <input v-model="form.title" class="form-control mb-3" placeholder="Titre" />
-        <QuillEditor v-model:content="form.content" contentType="html" theme="snow" class="mb-3" />
+        <textarea v-model="form.content" class="form-control mb-3" rows="6" placeholder="Contenu HTML..." />
         <div class="d-flex justify-content-end gap-2">
           <button @click="saveChanges" class="btn btn-primary">Enregistrer</button>
           <button @click="cancelEdit" class="btn btn-outline-secondary">Annuler</button>
@@ -56,7 +56,6 @@
       <p>Chargement de l'article...</p>
     </div>
 
-    <!-- Modal de signalement -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content">
         <h5>Signaler un commentaire</h5>
@@ -81,8 +80,6 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -149,11 +146,19 @@ const cancelEdit = () => {
 }
 
 const saveChanges = async () => {
+  const formData = new FormData()
+  formData.append('title', form.value.title)
+  formData.append('content', form.value.content)
+  formData.append('is_published', true)
+
   try {
-    const res = await axios.put(`http://127.0.0.1:8000/api/blog/articles/${route.params.id}/`, form.value, { headers })
+    const res = await axios.put(`http://127.0.0.1:8000/api/blog/articles/${route.params.id}/`, formData, {
+      headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+    })
     article.value = res.data
     isEditing.value = false
   } catch (err) {
+    console.error("❌ Erreur lors de la mise à jour de l'article :", err)
     alert("Erreur lors de la mise à jour de l'article.")
   }
 }

@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, serializers
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 import logging
@@ -22,6 +22,27 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    def toggle_like(self, request, pk=None):
+        article = self.get_object()
+        user = request.user
+        if user in article.likes.all():
+            article.likes.remove(user)
+            liked = False
+        else:
+            article.likes.add(user)
+            liked = True
+        return Response({'liked': liked, 'likes_count': article.likes.count()})
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
@@ -96,10 +117,9 @@ def delete_reported_comment(request, comment_id):
 @api_view(['PATCH'])
 @permission_classes([IsAdminUser])
 def ignore_report(request, comment_id):
-    try:
-        report = Report.objects.get(reported_comment__id=comment_id, resolved=False)
-        report.resolved = True
-        report.save()
-        return Response({"message": "Signalement ignoré avec succès."}, status=200)
-    except Report.DoesNotExist:
-        return Response({"error": "Signalement non trouvé."}, status=404)
+    reports = Report.objects.filter(reported_comment__id=comment_id, resolved=False)
+    print("🔍 Nombre de signalements non résolus trouvés :", reports.count())
+    if not reports.exists():
+        return Response({"error": "Aucun signalement trouvé pour ce commentaire."}, status=404)
+    reports.update(resolved=True)
+    return Response({"message": "Tous les signalements ont été ignorés avec succès."}, status=200)

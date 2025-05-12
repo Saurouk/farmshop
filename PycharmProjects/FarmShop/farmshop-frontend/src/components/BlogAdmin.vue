@@ -79,13 +79,13 @@
       <ul class="list-group">
         <li class="list-group-item d-flex justify-content-between align-items-start bg-warning-subtle" v-for="r in reports" :key="r.id">
           <div>
-            <strong>Commentaire #{{ r.reported_comment }}</strong><br />
+            <strong>Commentaire #{{ r.reported_comment.id || r.reported_comment }}</strong><br />
             <span class="text-muted small">Signalé par : {{ r.reporter }}</span><br />
             <span class="text-muted small">Motif : {{ r.reason }}</span>
           </div>
           <div class="d-flex gap-2">
-            <button @click="deleteComment(r.reported_comment)" class="btn btn-sm btn-danger">Supprimer</button>
-            <button @click="ignoreReport(r.reported_comment)" class="btn btn-sm btn-outline-dark">Ignorer</button>
+            <button @click="deleteComment(r.reported_comment.id || r.reported_comment)" class="btn btn-sm btn-danger">Supprimer</button>
+            <button @click="ignoreReport(r.reported_comment.id || r.reported_comment)" class="btn btn-sm btn-outline-dark">Ignorer</button>
           </div>
         </li>
       </ul>
@@ -186,6 +186,8 @@ const submitForm = async () => {
   formData.append('is_published', form.value.is_published)
   if (form.value.thumbnail) {
     formData.append('thumbnail', form.value.thumbnail)
+  } else if (editingArticle.value) {
+    formData.append('thumbnail', '')
   }
 
   try {
@@ -233,9 +235,23 @@ const deleteComment = async (id) => {
   fetchAll()
 }
 
-const ignoreReport = async (id) => {
-  await axios.patch(`http://127.0.0.1:8000/api/blog/admin/ignore-report/${id}/`, {}, { headers })
-  fetchAll()
+const ignoreReport = async (commentId) => {
+  console.log("🔍 ID du commentaire à ignorer :", commentId)
+  try {
+    const res = await axios.patch(
+      `http://127.0.0.1:8000/api/blog/admin/ignore-report/${commentId}/`,
+      {}, // corps vide car c’est un PATCH sans payload
+      { headers }
+    )
+    console.log("✅ Signalement ignoré :", res.data)
+    fetchAll()
+  } catch (err) {
+    if (err.response) {
+      console.error("❌ Erreur lors de l’ignorance du signalement :", err.response.data)
+    } else {
+      console.error("❌ Erreur réseau ou serveur :", err)
+    }
+  }
 }
 
 const formatDate = (date) => {
