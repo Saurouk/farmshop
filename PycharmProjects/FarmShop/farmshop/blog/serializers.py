@@ -25,7 +25,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'id', 'title', 'content', 'author',
             'created_at', 'updated_at', 'is_published',
             'comments_count', 'comments', 'thumbnail',
-            'likes_count', 'liked_by_user', 'likes'
+            'likes_count', 'liked_by_user', 'likes',
+            'views'
         ]
 
     def get_likes_count(self, obj):

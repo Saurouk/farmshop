@@ -27,6 +27,9 @@ class ProductSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    likes_count = serializers.SerializerMethodField()
+    liked_by_user = serializers.SerializerMethodField()
+    views = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Product
@@ -34,7 +37,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'price', 'stock',
             'low_stock_threshold', 'is_available', 'category_id',
             'category', 'unit_of_measure', 'image', 'images',
-            'images_upload', 'is_rentable'
+            'images_upload', 'is_rentable',
+            'likes_count', 'liked_by_user', 'views'
         ]
 
     def create(self, validated_data):
@@ -50,6 +54,15 @@ class ProductSerializer(serializers.ModelSerializer):
         for img in images_data:
             ProductImage.objects.create(product=product, image=img)
         return product
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_liked_by_user(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return request.user in obj.likes.all()
+        return False
 
 class RentalSerializer(serializers.ModelSerializer):
     class Meta:

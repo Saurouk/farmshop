@@ -11,9 +11,12 @@ class Article(models.Model):
     is_reported = models.BooleanField(default=False)
     thumbnail = models.ImageField(upload_to="blog/thumbnails/", null=True, blank=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_articles', blank=True)
+    views = models.PositiveIntegerField(default=0)
+
 
     def __str__(self):
         return self.title
+
 
 class Comment(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comments")

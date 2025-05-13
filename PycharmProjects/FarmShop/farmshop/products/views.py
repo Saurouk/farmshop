@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 from django.conf import settings
@@ -19,7 +19,6 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
-
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('-id')
@@ -34,6 +33,13 @@ class ProductViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.views += 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -47,6 +53,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         product = serializer.save()
         return Response(serializer.data)
+
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    def toggle_like(self, request, pk=None):
+        product = self.get_object()
+        user = request.user
+        if user in product.likes.all():
+            product.likes.remove(user)
+            liked = False
+        else:
+            product.likes.add(user)
+            liked = True
+        return Response({'liked': liked, 'likes_count': product.likes.count()})
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -171,7 +189,7 @@ class CreateRentalPaymentIntentView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
-#  suppression image secondaire
+
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def delete_product_image(request, pk):
@@ -182,7 +200,7 @@ def delete_product_image(request, pk):
     except ProductImage.DoesNotExist:
         return Response({'error': 'Image non trouvée'}, status=status.HTTP_404_NOT_FOUND)
 
-# suppression image principale
+
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def delete_main_image(request, product_id):

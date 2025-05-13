@@ -36,6 +36,8 @@ class Product(models.Model):
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_products', blank=True)
+    views = models.PositiveIntegerField(default=0)
 
     @property
     def is_available(self):

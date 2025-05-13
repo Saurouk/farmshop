@@ -6,8 +6,9 @@ from .views import (
     CategoryViewSet,
     WishlistViewSet,
     CreateRentalPaymentIntentView,
-    RemoveFromWishlistView, delete_main_image, delete_product_image
-
+    RemoveFromWishlistView,
+    delete_main_image,
+    delete_product_image,
 )
 
 router = DefaultRouter()
@@ -22,4 +23,5 @@ urlpatterns = [
     path('wishlist/<int:product_id>/remove/', RemoveFromWishlistView.as_view(), name='wishlist-remove'),
     path('images/<int:pk>/', delete_product_image),
     path('<int:product_id>/delete-main-image/', delete_main_image),
+    path('<int:pk>/toggle-like/', ProductViewSet.as_view({'post': 'toggle_like'}), name='product-toggle-like'),
 ]

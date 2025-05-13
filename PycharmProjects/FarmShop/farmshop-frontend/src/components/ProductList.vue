@@ -13,7 +13,24 @@
             <p class="text-muted">{{ product.category }}</p>
             <p class="fw-bold text-success">{{ product.price }} €</p>
             <p class="text-muted small">Stock: {{ product.stock }}</p>
-            <div class="d-flex align-items-center gap-2 mt-3">
+
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <button class="btn btn-sm btn-outline-danger" @click="toggleLike(product)">
+                ❤️ {{ product.likes_count }}
+              </button>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  Partager
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" :href="facebookLink(product)" target="_blank">Facebook</a></li>
+                  <li><a class="dropdown-item" :href="twitterLink(product)" target="_blank">Twitter</a></li>
+                  <li><a class="dropdown-item" :href="whatsappLink(product)" target="_blank">WhatsApp</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mt-2">
               <input type="number" min="1" v-model.number="quantities[product.id]" class="form-control w-50" />
               <button
                 class="btn btn-outline-primary btn-sm"
@@ -109,6 +126,41 @@ const addToCart = async (productId) => {
       successProductId.value = null
     }, 2000)
   }
+}
+
+const toggleLike = async (product) => {
+  const token = localStorage.getItem('access_token')
+  if (!token) {
+    toast.warning("Vous devez être connecté pour aimer un produit.")
+    return
+  }
+
+  try {
+    const res = await axios.post(
+      `http://127.0.0.1:8000/api/products/${product.id}/toggle_like/`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    product.likes_count = res.data.likes_count
+  } catch (err) {
+    console.error("❌ Erreur like produit :", err)
+    toast.error("Une erreur est survenue.")
+  }
+}
+
+const facebookLink = (product) => {
+  const url = encodeURIComponent(`${window.location.origin}/products/${product.id}`)
+  return `https://www.facebook.com/sharer/sharer.php?u=${url}`
+}
+
+const twitterLink = (product) => {
+  const url = encodeURIComponent(`${window.location.origin}/products/${product.id}`)
+  return `https://twitter.com/intent/tweet?url=${url}&text=Découvrez ce produit !`
+}
+
+const whatsappLink = (product) => {
+  const url = encodeURIComponent(`${window.location.origin}/products/${product.id}`)
+  return `https://api.whatsapp.com/send?text=Découvrez ce produit : ${url}`
 }
 
 onMounted(() => {

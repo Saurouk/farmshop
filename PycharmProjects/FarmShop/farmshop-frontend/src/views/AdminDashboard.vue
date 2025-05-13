@@ -8,6 +8,7 @@
       <button @click="activeTab = 'products'" class="btn btn-success">Gérer les produits</button>
       <button @click="activeTab = 'categories'" class="btn btn-dark">Gérer les catégories</button>
       <button @click="activeTab = 'locations'" class="btn btn-warning">Gérer les locations</button>
+      <button @click="activeTab = 'stats'" class="btn btn-info">Statistiques vues</button>
     </div>
 
     <UsersManagement v-if="activeTab === 'users'" />
@@ -15,6 +16,7 @@
     <ProductAdmin v-if="activeTab === 'products'" />
     <CategoryAdmin v-if="activeTab === 'categories'" />
     <AdminRentalsView v-if="activeTab === 'locations'" />
+    <DashboardStats v-if="activeTab === 'stats'" />
   </div>
 </template>
 
@@ -25,6 +27,7 @@ import BlogAdmin from "@/components/BlogAdmin.vue"
 import ProductAdmin from "@/components/ProductAdmin.vue"
 import CategoryAdmin from "@/components/CategoryAdmin.vue"
 import AdminRentalsView from "@/components/AdminRentalsView.vue"
+import DashboardStats from "@/components/DashboardStats.vue"
 
 const activeTab = ref("users")
 </script>
