@@ -17,6 +17,18 @@ const routes = [
   { path: '/contact', component: ContactView },
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
+
+  {
+    path: '/activation-success',
+    name: 'ActivationSuccess',
+    component: () => import('@/views/ActivationSuccessView.vue')
+  },
+  {
+    path: '/activation-failed',
+    name: 'ActivationFailed',
+    component: () => import('@/views/ActivationFailedView.vue')
+  },
+
   {
     path: '/profile',
     name: 'UserProfile',

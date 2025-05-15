@@ -49,6 +49,7 @@
           <th>Auteur</th>
           <th>Commentaires</th>
           <th>Vues</th>
+          <th>Likes</th> <!-- ✅ Ajouté -->
         </tr>
       </thead>
       <tbody>
@@ -57,6 +58,7 @@
           <td>{{ article.author }}</td>
           <td>{{ article.comments_count }}</td>
           <td>{{ article.views }}</td>
+          <td>{{ article.likes_count }}</td> <!-- ✅ Ajouté -->
         </tr>
       </tbody>
     </table>

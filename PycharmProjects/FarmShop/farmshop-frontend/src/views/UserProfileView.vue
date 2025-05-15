@@ -9,7 +9,7 @@
     <div v-else class="profile-wrapper shadow p-4 rounded bg-white">
       <div class="d-flex align-items-center gap-4 mb-4">
         <img
-          :src="user.profile_picture ? user.profile_picture : defaultAvatar"
+          :src="user.profile_picture ? user.profile_picture + '?ts=' + Date.now() : defaultAvatar"
           class="rounded-circle profile-pic"
           alt="avatar"
         />
@@ -23,7 +23,38 @@
         </div>
       </div>
 
+      <div class="mb-3">
+        <label for="bio" class="form-label">Bio</label>
+
+        <div v-if="!editBio">
+          <p class="text-muted">{{ user.bio || 'Aucune bio renseignée.' }}</p>
+          <button class="btn btn-sm btn-outline-secondary" @click="editBio = true">Modifier la bio</button>
+        </div>
+
+        <div v-else>
+          <textarea
+            id="bio"
+            v-model="user.bio"
+            class="form-control"
+            rows="3"
+            placeholder="Parlez un peu de vous..."
+          ></textarea>
+          <button class="btn btn-primary btn-sm mt-2 me-2" @click="updateBio">
+            Enregistrer
+          </button>
+          <button class="btn btn-sm btn-secondary mt-2" @click="editBio = false">
+            Annuler
+          </button>
+        </div>
+      </div>
+
       <hr />
+
+      <div class="section text-center mb-4">
+        <button class="btn btn-outline-danger" @click="deleteAccount">
+          ❌ Supprimer mon compte
+        </button>
+      </div>
 
       <div class="section">
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -89,6 +120,7 @@ const loading = ref(true)
 const defaultAvatar = '/default-avatar.png'
 const showModal = ref(false)
 const showInbox = ref(true)
+const editBio = ref(false)
 
 const fetchProfile = async () => {
   const token = localStorage.getItem('access_token')
@@ -109,6 +141,11 @@ const uploadProfilePicture = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
+  if (!file.type.startsWith('image/')) {
+    alert("Seules les images sont autorisées.")
+    return
+  }
+
   const formData = new FormData()
   formData.append('profile_picture', file)
   const token = localStorage.getItem('access_token')
@@ -123,6 +160,68 @@ const uploadProfilePicture = async (event) => {
     fetchProfile()
   } catch (err) {
     console.error('Erreur upload photo :', err)
+    if (err.response && err.response.data) {
+      console.error('Détail de l\'erreur Django :', err.response.data)
+      for (const [field, errors] of Object.entries(err.response.data)) {
+        console.error(`🛑 Champ : ${field} →`, errors)
+      }
+    }
+  }
+}
+
+const updateBio = async () => {
+  console.log("🔁 Tentative de mise à jour de la bio...")
+  const token = localStorage.getItem('access_token')
+  try {
+    const res = await axios.patch('http://127.0.0.1:8000/api/users/me/', {
+      bio: user.value.bio
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    console.log("✅ Réponse de Django :", res.data)
+    editBio.value = false
+  } catch (err) {
+    console.error('❌ Erreur mise à jour bio :', err)
+    if (err.response?.data) {
+      console.error('🧾 Détail Django :', err.response.data)
+    }
+  }
+}
+
+const deleteAccount = async () => {
+  if (!confirm("Voulez-vous télécharger vos données avant de supprimer votre compte ?")) return
+
+  const token = localStorage.getItem('access_token')
+  try {
+    const res = await axios.get('http://127.0.0.1:8000/api/users/download/', {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob'
+    })
+
+    const url = window.URL.createObjectURL(new Blob([res.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${user.value.username}_donnees.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+
+    const confirmDel = confirm("Téléchargement terminé. Supprimer maintenant votre compte ?")
+    if (!confirmDel) return
+
+    await axios.delete('http://127.0.0.1:8000/api/users/me/delete/', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    alert("Votre compte a été supprimé avec succès.")
+    localStorage.clear()
+    window.location.href = '/login'
+  } catch (err) {
+    console.error('Erreur pendant la suppression du compte :', err)
   }
 }
 

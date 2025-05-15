@@ -27,14 +27,12 @@
       </tbody>
     </table>
 
-    <!-- PAGINATION -->
     <div class="pagination-controls d-flex justify-content-center gap-3 mt-3">
       <button @click="changePage(currentPage - 1)" :disabled="!prevPage" class="btn btn-outline-primary">← Précédent</button>
       <span>Page {{ currentPage }}</span>
       <button @click="changePage(currentPage + 1)" :disabled="!nextPage" class="btn btn-outline-primary">Suivant →</button>
     </div>
 
-    <!-- MODAL AJOUT / MODIFICATION UTILISATEUR -->
     <div v-if="showModal" class="modal">
       <div class="modal-content">
         <h3>{{ editingUser ? "Modifier" : "Ajouter" }} un utilisateur</h3>
@@ -75,7 +73,7 @@ const newUser = ref({
 const fetchUsers = async (page = 1) => {
   try {
     const token = localStorage.getItem("access_token");
-    const response = await axios.get(`${API_BASE_URL}/users/?page=${page}`, {
+    const response = await axios.get(`${API_BASE_URL}/users/admin/users/?page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -109,10 +107,10 @@ const saveUser = async () => {
       },
     };
 
-    if (editingUser.value) {
-      await axios.put(`${API_BASE_URL}/users/${editingUser.value.id}/`, newUser.value, config);
+    if (editingUser.value && editingUser.value.id) {
+      await axios.put(`${API_BASE_URL}/users/admin/users/${editingUser.value.id}/`, newUser.value, config);
     } else {
-      await axios.post(`${API_BASE_URL}/users/`, newUser.value, config);
+      await axios.post(`${API_BASE_URL}/users/admin/users/`, newUser.value, config);
     }
 
     closeModal();
@@ -127,7 +125,7 @@ const deleteUser = async (userId) => {
 
   try {
     const token = localStorage.getItem("access_token");
-    await axios.delete(`${API_BASE_URL}/users/${userId}/`, {
+    await axios.delete(`${API_BASE_URL}/users/admin/users/${userId}/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

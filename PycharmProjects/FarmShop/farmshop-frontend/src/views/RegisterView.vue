@@ -13,6 +13,7 @@
       </form>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
       <p>Déjà inscrit ? <router-link to="/login">Connectez-vous</router-link></p>
     </div>
@@ -23,41 +24,45 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import auth from "@/stores/auth";
 
 const username = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const errorMessage = ref("");
+const successMessage = ref("");
 const router = useRouter();
 
 const register = async () => {
+  errorMessage.value = "";
+  successMessage.value = "";
+
   if (password.value !== confirmPassword.value) {
     errorMessage.value = "Les mots de passe ne correspondent pas.";
     return;
   }
 
   try {
-    const response = await axios.post("http://127.0.0.1:8000/auth/register/", {
+    const response = await axios.post("http://127.0.0.1:8000/api/users/register/", {
       username: username.value,
       email: email.value,
       password: password.value,
     });
 
-    const { access, refresh, user } = response.data;
-
-    localStorage.setItem("access_token", access);
-    localStorage.setItem("refresh_token", refresh);
-    localStorage.setItem("username", user.username);
-    localStorage.setItem("isAdmin", user.is_staff ? "true" : "false");
-
-    // si tu utilises le store global :
-    auth.setUser(user);
-
-    router.push("/");
+    successMessage.value = response.data.message || "Inscription réussie. Veuillez vérifier votre e-mail pour activer votre compte.";
+    setTimeout(() => {
+      router.push("/login");
+    }, 2500);
   } catch (error) {
-    errorMessage.value = "Erreur lors de l'inscription. Veuillez réessayer.";
+    if (error.response && error.response.data) {
+      const errors = error.response.data;
+      const details = Object.entries(errors)
+        .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+        .join('\n');
+      errorMessage.value = `Erreur(s) :\n${details}`;
+    } else {
+      errorMessage.value = "Erreur lors de l'inscription. Veuillez réessayer.";
+    }
     console.error("❌ Erreur inscription :", error);
   }
 };
@@ -105,6 +110,12 @@ button:hover {
 
 .error {
   color: red;
+  margin-top: 10px;
+  white-space: pre-line;
+}
+
+.success {
+  color: green;
   margin-top: 10px;
 }
 </style>

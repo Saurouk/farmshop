@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import update_last_login
+from django.shortcuts import redirect
 from rest_framework import generics, status, viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import api_view, permission_classes, action, parser_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -10,13 +11,22 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserSerializer, MessageSerializer, AdminDashboardSerializer
 from .models import Message
-from products.models import Product
+from products.models import Product, Rental
 from blog.models import Article, Comment
+from orders.models import Order
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+
 
 User = get_user_model()
 
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def get_current_user(request):
     user = request.user
 
@@ -30,6 +40,13 @@ def get_current_user(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    user = request.user
+    user.delete()
+    return Response({"message": "Votre compte a été supprimé avec succès."}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -94,17 +111,42 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "user": UserSerializer(user).data,
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        user = serializer.save()
+        user.is_active = False
+        user.save()
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        current_site = get_current_site(self.request)
+        activation_link = f"http://{current_site.domain}/api/users/confirm/{uid}/{token}/"
+
+        subject = "Activation de votre compte FarmShop"
+        message = f"Bonjour {user.username},\n\nMerci de vous être inscrit sur FarmShop !\n\nVeuillez cliquer sur le lien ci-dessous pour activer votre compte :\n\n{activation_link}\n\nSi vous n'avez pas demandé cette inscription, ignorez ce message."
+
+        send_mail(
+            subject,
+            message,
+            None,
+            [user.email],
+            fail_silently=False,
+        )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def confirm_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return redirect('http://localhost:5173/activation-failed')
+
+    if default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return redirect('http://localhost:5173/activation-success')
+    else:
+        return redirect('http://localhost:5173/activation-failed')
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -167,3 +209,68 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             return Response({"error": "Nom d'utilisateur ou mot de passe incorrect."}, status=401)
 
         return response
+
+from django.http import FileResponse
+from django.conf import settings
+import zipfile
+import os
+import tempfile
+import json
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_user_data(request):
+    user = request.user
+    temp_dir = tempfile.mkdtemp()
+
+    from users.models import Message
+
+    user_data = {
+        "username": user.username,
+        "email": user.email,
+        "bio": user.bio,
+    }
+
+    with open(os.path.join(temp_dir, "user.json"), "w") as f:
+        json.dump(user_data, f)
+
+    def write_json(name, queryset):
+        path = os.path.join(temp_dir, f"{name}.json")
+        with open(path, "w") as f:
+            json.dump([
+                {field.name: getattr(obj, field.name) for field in obj._meta.fields}
+                for obj in queryset
+            ], f)
+
+    write_json("commandes", Order.objects.filter(user=user))
+    write_json("locations", Rental.objects.filter(user=user))
+    write_json("messages", Message.objects.filter(recipient=user))
+
+    if user.profile_picture and os.path.exists(user.profile_picture.path):
+        with open(user.profile_picture.path, "rb") as src:
+            with open(os.path.join(temp_dir, os.path.basename(user.profile_picture.name)), "wb") as dst:
+                dst.write(src.read())
+
+    for msg in Message.objects.filter(recipient=user):
+        if msg.attachment and os.path.exists(msg.attachment.path):
+            with open(msg.attachment.path, "rb") as src:
+                with open(os.path.join(temp_dir, os.path.basename(msg.attachment.name)), "wb") as dst:
+                    dst.write(src.read())
+
+    facture_dir = os.path.join(settings.MEDIA_ROOT, "factures")
+    if os.path.exists(facture_dir):
+        for f in os.listdir(facture_dir):
+            if f.startswith(f"facture_{user.id}_"):
+                path = os.path.join(facture_dir, f)
+                with open(path, "rb") as src:
+                    with open(os.path.join(temp_dir, f), "wb") as dst:
+                        dst.write(src.read())
+
+    zip_path = os.path.join(temp_dir, f"{user.username}_data.zip")
+    with zipfile.ZipFile(zip_path, "w") as zipf:
+        for root, _, files in os.walk(temp_dir):
+            for file in files:
+                if file != os.path.basename(zip_path):
+                    zipf.write(os.path.join(root, file), arcname=file)
+
+    return FileResponse(open(zip_path, "rb"), as_attachment=True, filename=f"{user.username}_data.zip")

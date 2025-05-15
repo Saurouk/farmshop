@@ -6,7 +6,7 @@
       <div v-for="product in products" :key="product.id" class="col-md-4">
         <div class="card h-100 shadow-sm">
           <router-link :to="`/products/${product.id}`" class="text-decoration-none">
-            <div class="product-thumb" :style="{ backgroundImage: `url(${BASE_MEDIA}${product.image})` }"></div>
+            <div class="product-thumb" :style="{ backgroundImage: `url(${product.image})` }"></div>
           </router-link>
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
@@ -62,8 +62,6 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import { fetchCartCount } from '@/stores/cart'
-
-const BASE_MEDIA = 'http://127.0.0.1:8000'
 
 const products = ref([])
 const nextPage = ref(null)

@@ -13,7 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password', 'profile_picture',
+            'id', 'username', 'email', 'password',
+            'profile_picture', 'bio',  # ➕ bio ajouté ici
             'is_staff', 'admin_contact', 'inbox'
         ]
         extra_kwargs = {'password': {'write_only': True}}
@@ -21,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = self.Meta.model(**validated_data)
+        user.is_active = False  # 🔐 Nécessite confirmation par e-mail
         if password:
             user.set_password(password)
         user.save()
@@ -55,7 +57,6 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'sender', 'recipient', 'content', 'is_read', 'created_at', 'attachment']
         read_only_fields = ['id', 'sender', 'created_at']
-
 
 
 class AdminDashboardSerializer(serializers.Serializer):

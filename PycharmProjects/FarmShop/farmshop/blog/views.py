@@ -17,6 +17,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
+        if self.action == 'toggle_like':
+            return [IsAuthenticated()]
         if self.request.method == 'GET':
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
