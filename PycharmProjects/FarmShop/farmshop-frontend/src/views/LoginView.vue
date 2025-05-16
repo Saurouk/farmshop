@@ -21,7 +21,7 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import auth from "@/stores/auth";  // ✅ Importer l'état global
+import auth from "@/stores/auth";
 
 const username = ref("");
 const password = ref("");
@@ -30,20 +30,24 @@ const router = useRouter();
 
 const login = async () => {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/auth/login/", {
+    const response = await axios.post("http://127.0.0.1:8000/api/users/login/", {
       username: username.value,
       password: password.value,
     });
 
-    // ✅ Stocker les tokens JWT et le username
-    auth.setUser({ username: username.value });
-    localStorage.setItem("access_token", response.data.access);
-    localStorage.setItem("refresh_token", response.data.refresh);
+    const { access, refresh, user } = response.data;
 
-    // ✅ Rediriger après connexion réussie
+    localStorage.setItem("access_token", access);
+    localStorage.setItem("refresh_token", refresh);
+    localStorage.setItem("username", user.username);
+    localStorage.setItem("isAdmin", user.is_staff ? "true" : "false");
+
+    auth.setUser(user);
+
     router.push("/");
   } catch (error) {
     errorMessage.value = "Nom d'utilisateur ou mot de passe incorrect.";
+    console.error("❌ Erreur de connexion :", error);
   }
 };
 </script>

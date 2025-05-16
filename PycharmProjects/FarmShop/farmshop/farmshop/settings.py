@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'cart',
     'orders',
     'users',
+    'newsletter',
     'rest_framework.authtoken',
     'django_filters',
     'drf_spectacular',

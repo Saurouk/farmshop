@@ -9,11 +9,16 @@
         <input v-model="email" type="email" placeholder="Email" required />
         <input v-model="password" type="password" placeholder="Mot de passe" required />
         <input v-model="confirmPassword" type="password" placeholder="Confirmer le mot de passe" required />
+
+        <div class="newsletter-optin">
+          <input type="checkbox" id="newsletter" v-model="wantsNewsletter" />
+          <label for="newsletter">Je souhaite recevoir la newsletter</label>
+        </div>
+
         <button type="submit">S'inscrire</button>
       </form>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-      <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
       <p>Déjà inscrit ? <router-link to="/login">Connectez-vous</router-link></p>
     </div>
@@ -29,40 +34,28 @@ const username = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const wantsNewsletter = ref(false);
 const errorMessage = ref("");
-const successMessage = ref("");
 const router = useRouter();
 
 const register = async () => {
-  errorMessage.value = "";
-  successMessage.value = "";
-
   if (password.value !== confirmPassword.value) {
     errorMessage.value = "Les mots de passe ne correspondent pas.";
     return;
   }
 
   try {
-    const response = await axios.post("http://127.0.0.1:8000/api/users/register/", {
+    await axios.post("http://127.0.0.1:8000/api/users/register/", {
       username: username.value,
       email: email.value,
       password: password.value,
+      wants_newsletter: wantsNewsletter.value,
     });
 
-    successMessage.value = response.data.message || "Inscription réussie. Veuillez vérifier votre e-mail pour activer votre compte.";
-    setTimeout(() => {
-      router.push("/login");
-    }, 2500);
+    alert("Inscription réussie. Veuillez vérifier votre boîte mail pour activer votre compte.");
+    router.push("/login");
   } catch (error) {
-    if (error.response && error.response.data) {
-      const errors = error.response.data;
-      const details = Object.entries(errors)
-        .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
-        .join('\n');
-      errorMessage.value = `Erreur(s) :\n${details}`;
-    } else {
-      errorMessage.value = "Erreur lors de l'inscription. Veuillez réessayer.";
-    }
+    errorMessage.value = "Erreur lors de l'inscription. Veuillez réessayer.";
     console.error("❌ Erreur inscription :", error);
   }
 };
@@ -94,6 +87,11 @@ input {
   border-radius: 5px;
 }
 
+.newsletter-optin {
+  text-align: left;
+  margin: 10px 0;
+}
+
 button {
   width: 100%;
   padding: 10px;
@@ -110,12 +108,6 @@ button:hover {
 
 .error {
   color: red;
-  margin-top: 10px;
-  white-space: pre-line;
-}
-
-.success {
-  color: green;
   margin-top: 10px;
 }
 </style>

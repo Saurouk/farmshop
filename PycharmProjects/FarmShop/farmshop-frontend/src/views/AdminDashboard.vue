@@ -9,6 +9,7 @@
       <button @click="activeTab = 'categories'" class="btn btn-dark">Gérer les catégories</button>
       <button @click="activeTab = 'locations'" class="btn btn-warning">Gérer les locations</button>
       <button @click="activeTab = 'stats'" class="btn btn-info">Statistiques vues</button>
+      <button @click="activeTab = 'newsletter'" class="btn btn-outline-info">Gérer les newsletters</button>
     </div>
 
     <UsersManagement v-if="activeTab === 'users'" />
@@ -17,6 +18,7 @@
     <CategoryAdmin v-if="activeTab === 'categories'" />
     <AdminRentalsView v-if="activeTab === 'locations'" />
     <DashboardStats v-if="activeTab === 'stats'" />
+    <NewsletterAdmin v-if="activeTab === 'newsletter'" />
   </div>
 </template>
 
@@ -28,6 +30,7 @@ import ProductAdmin from "@/components/ProductAdmin.vue"
 import CategoryAdmin from "@/components/CategoryAdmin.vue"
 import AdminRentalsView from "@/components/AdminRentalsView.vue"
 import DashboardStats from "@/components/DashboardStats.vue"
+import NewsletterAdmin from "@/components/NewsletterAdmin.vue"
 
 const activeTab = ref("users")
 </script>

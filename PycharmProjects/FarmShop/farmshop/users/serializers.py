@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'password',
-            'profile_picture', 'bio',  # ➕ bio ajouté ici
+            'profile_picture', 'bio', 'wants_newsletter',
             'is_staff', 'admin_contact', 'inbox'
         ]
         extra_kwargs = {'password': {'write_only': True}}
@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = self.Meta.model(**validated_data)
-        user.is_active = False  # 🔐 Nécessite confirmation par e-mail
         if password:
             user.set_password(password)
         user.save()

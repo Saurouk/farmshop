@@ -4,6 +4,7 @@ from django.db import models
 class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
+    wants_newsletter = models.BooleanField(default=False)
 
     groups = models.ManyToManyField(
         "auth.Group",

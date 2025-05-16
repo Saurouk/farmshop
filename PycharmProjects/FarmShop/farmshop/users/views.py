@@ -6,7 +6,6 @@ from rest_framework.decorators import api_view, permission_classes, action, pars
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import UserSerializer, MessageSerializer, AdminDashboardSerializer
@@ -21,32 +20,39 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 
+from django.http import FileResponse
+from django.conf import settings
+import zipfile
+import os
+import tempfile
+import json
 
 User = get_user_model()
+
 
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def get_current_user(request):
     user = request.user
-
     if request.method == 'GET':
         serializer = UserSerializer(user)
         return Response(serializer.data)
-
     if request.method == 'PATCH':
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=400)
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_account(request):
     user = request.user
     user.delete()
-    return Response({"message": "Votre compte a été supprimé avec succès."}, status=status.HTTP_200_OK)
+    return Response({"message": "Votre compte a été supprimé avec succès."})
+
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -55,15 +61,17 @@ def list_users(request):
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         user.delete()
-        return Response({"message": "Utilisateur supprimé avec succès."}, status=200)
+        return Response({"message": "Utilisateur supprimé avec succès."})
     except User.DoesNotExist:
         return Response({"error": "Utilisateur non trouvé."}, status=404)
+
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
@@ -79,58 +87,55 @@ def update_user(request, user_id):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
+
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def create_user(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save(commit=False) if hasattr(serializer, 'save') else None
-        if user:
-            user.set_password(request.data['password'])
-            user.save()
-            return Response(UserSerializer(user).data, status=201)
-        return Response({"error": "Impossible de créer l'utilisateur"}, status=400)
+        user = serializer.save()
+        user.set_password(request.data['password'])
+        user.save()
+        return Response(UserSerializer(user).data, status=201)
     return Response(serializer.errors, status=400)
+
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_dashboard(request):
-    if not request.user.is_staff:
-        return Response({"error": "Accès refusé. Vous n'êtes pas admin."}, status=403)
-
     stats = {
         "total_users": User.objects.count(),
         "total_products": Product.objects.count(),
         "total_blog_posts": Article.objects.count(),
         "reported_comments": Comment.objects.filter(report__resolved=False).count(),
     }
-    return Response(stats, status=200)
+    return Response(stats)
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
-    def perform_create(self, serializer):
-        user = serializer.save()
-        user.is_active = False
-        user.save()
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            user.is_active = False
+            user.save()
 
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        current_site = get_current_site(self.request)
-        activation_link = f"http://{current_site.domain}/api/users/confirm/{uid}/{token}/"
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            current_site = get_current_site(request)
+            activation_link = f"http://{current_site.domain}/api/users/confirm/{uid}/{token}/"
 
-        subject = "Activation de votre compte FarmShop"
-        message = f"Bonjour {user.username},\n\nMerci de vous être inscrit sur FarmShop !\n\nVeuillez cliquer sur le lien ci-dessous pour activer votre compte :\n\n{activation_link}\n\nSi vous n'avez pas demandé cette inscription, ignorez ce message."
+            subject = "Activation de votre compte FarmShop"
+            message = f"Bonjour {user.username},\n\nMerci de vous être inscrit sur FarmShop !\n\nVeuillez cliquer sur le lien ci-dessous pour activer votre compte :\n\n{activation_link}\n\nSi vous n'avez pas demandé cette inscription, ignorez ce message."
 
-        send_mail(
-            subject,
-            message,
-            None,
-            [user.email],
-            fail_silently=False,
-        )
+            send_mail(subject, message, None, [user.email], fail_silently=False)
+            return Response({"message": "Inscription réussie. Vérifiez votre boîte mail."}, status=201)
+        return Response(serializer.errors, status=400)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -138,7 +143,7 @@ def confirm_email(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (User.DoesNotExist, ValueError, OverflowError):
         return redirect('http://localhost:5173/activation-failed')
 
     if default_token_generator.check_token(user, token):
@@ -148,31 +153,13 @@ def confirm_email(request, uidb64, token):
     else:
         return redirect('http://localhost:5173/activation-failed')
 
+
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
     parser_classes = [JSONParser]
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return User.objects.all().order_by('-date_joined')
-        return User.objects.filter(id=user.id)
-
-    def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        user.delete()
-        return Response({"message": "Utilisateur supprimé avec succès"}, status=200)
-
-    @action(detail=True, methods=['put'], permission_classes=[IsAdminUser])
-    def update_user(self, request, pk=None):
-        user = self.get_object()
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -189,12 +176,11 @@ class MessageViewSet(viewsets.ModelViewSet):
             recipient_user = User.objects.get(username=recipient_username)
         except User.DoesNotExist:
             raise serializers.ValidationError("Destinataire introuvable.")
-
         serializer.save(sender=self.request.user, recipient=recipient_user)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
         username = request.data.get("username")
         password = request.data.get("password")
 
@@ -202,28 +188,24 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             return Response({"error": "Identifiants manquants."}, status=400)
 
         user = authenticate(username=username, password=password)
-        if user is not None:
-            update_last_login(None, user)
-            response.data["user"] = UserSerializer(user).data
-        else:
+
+        if user is None:
             return Response({"error": "Nom d'utilisateur ou mot de passe incorrect."}, status=401)
 
+        if not user.is_active:
+            return Response({"error": "Votre compte n'est pas activé."}, status=403)
+
+        update_last_login(None, user)
+        response = super().post(request, *args, **kwargs)
+        response.data["user"] = UserSerializer(user).data
         return response
 
-from django.http import FileResponse
-from django.conf import settings
-import zipfile
-import os
-import tempfile
-import json
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def download_user_data(request):
     user = request.user
     temp_dir = tempfile.mkdtemp()
-
-    from users.models import Message
 
     user_data = {
         "username": user.username,
@@ -235,8 +217,7 @@ def download_user_data(request):
         json.dump(user_data, f)
 
     def write_json(name, queryset):
-        path = os.path.join(temp_dir, f"{name}.json")
-        with open(path, "w") as f:
+        with open(os.path.join(temp_dir, f"{name}.json"), "w") as f:
             json.dump([
                 {field.name: getattr(obj, field.name) for field in obj._meta.fields}
                 for obj in queryset
@@ -256,15 +237,6 @@ def download_user_data(request):
             with open(msg.attachment.path, "rb") as src:
                 with open(os.path.join(temp_dir, os.path.basename(msg.attachment.name)), "wb") as dst:
                     dst.write(src.read())
-
-    facture_dir = os.path.join(settings.MEDIA_ROOT, "factures")
-    if os.path.exists(facture_dir):
-        for f in os.listdir(facture_dir):
-            if f.startswith(f"facture_{user.id}_"):
-                path = os.path.join(facture_dir, f)
-                with open(path, "rb") as src:
-                    with open(os.path.join(temp_dir, f), "wb") as dst:
-                        dst.write(src.read())
 
     zip_path = os.path.join(temp_dir, f"{user.username}_data.zip")
     with zipfile.ZipFile(zip_path, "w") as zipf:
