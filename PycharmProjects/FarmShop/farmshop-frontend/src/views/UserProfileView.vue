@@ -25,12 +25,10 @@
 
       <div class="mb-3">
         <label for="bio" class="form-label">Bio</label>
-
         <div v-if="!editBio">
           <p class="text-muted">{{ user.bio || 'Aucune bio renseignée.' }}</p>
           <button class="btn btn-sm btn-outline-secondary" @click="editBio = true">Modifier la bio</button>
         </div>
-
         <div v-else>
           <textarea
             id="bio"
@@ -46,6 +44,18 @@
             Annuler
           </button>
         </div>
+      </div>
+
+      <div class="mb-4">
+        <h5>📬 Newsletter</h5>
+        <p class="text-muted">Recevez nos dernières actualités et offres agricoles.</p>
+        <button
+          class="btn"
+          :class="subscribed ? 'btn-danger' : 'btn-success'"
+          @click="toggleNewsletter"
+        >
+          {{ subscribed ? 'Se désinscrire' : "S'inscrire à la newsletter" }}
+        </button>
       </div>
 
       <hr />
@@ -121,15 +131,18 @@ const defaultAvatar = '/default-avatar.png'
 const showModal = ref(false)
 const showInbox = ref(true)
 const editBio = ref(false)
+const subscribed = ref(false)
+
+const token = localStorage.getItem('access_token')
+const headers = { Authorization: `Bearer ${token}` }
 
 const fetchProfile = async () => {
-  const token = localStorage.getItem('access_token')
-  const headers = { Authorization: `Bearer ${token}` }
   try {
     const resUser = await axios.get('http://127.0.0.1:8000/api/users/me/', { headers })
     const resMessages = await axios.get('http://127.0.0.1:8000/api/users/messages/', { headers })
     user.value = resUser.data
     messages.value = resMessages.data.results || resMessages.data
+    await checkSubscription()
   } catch (err) {
     console.error('Erreur chargement du profil :', err)
   } finally {
@@ -139,68 +152,35 @@ const fetchProfile = async () => {
 
 const uploadProfilePicture = async (event) => {
   const file = event.target.files[0]
-  if (!file) return
-
-  if (!file.type.startsWith('image/')) {
-    alert("Seules les images sont autorisées.")
-    return
-  }
-
+  if (!file || !file.type.startsWith('image/')) return alert("Seules les images sont autorisées.")
   const formData = new FormData()
   formData.append('profile_picture', file)
-  const token = localStorage.getItem('access_token')
-
   try {
     await axios.patch('http://127.0.0.1:8000/api/users/me/', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
+      headers: { ...headers, 'Content-Type': 'multipart/form-data' }
     })
     fetchProfile()
   } catch (err) {
     console.error('Erreur upload photo :', err)
-    if (err.response && err.response.data) {
-      console.error('Détail de l\'erreur Django :', err.response.data)
-      for (const [field, errors] of Object.entries(err.response.data)) {
-        console.error(`🛑 Champ : ${field} →`, errors)
-      }
-    }
   }
 }
 
 const updateBio = async () => {
-  console.log("🔁 Tentative de mise à jour de la bio...")
-  const token = localStorage.getItem('access_token')
   try {
-    const res = await axios.patch('http://127.0.0.1:8000/api/users/me/', {
-      bio: user.value.bio
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    console.log("✅ Réponse de Django :", res.data)
+    await axios.patch('http://127.0.0.1:8000/api/users/me/', { bio: user.value.bio }, { headers })
     editBio.value = false
   } catch (err) {
     console.error('❌ Erreur mise à jour bio :', err)
-    if (err.response?.data) {
-      console.error('🧾 Détail Django :', err.response.data)
-    }
   }
 }
 
 const deleteAccount = async () => {
   if (!confirm("Voulez-vous télécharger vos données avant de supprimer votre compte ?")) return
-
-  const token = localStorage.getItem('access_token')
   try {
     const res = await axios.get('http://127.0.0.1:8000/api/users/download/', {
-      headers: { Authorization: `Bearer ${token}` },
+      headers,
       responseType: 'blob'
     })
-
     const url = window.URL.createObjectURL(new Blob([res.data]))
     const link = document.createElement('a')
     link.href = url
@@ -208,38 +188,55 @@ const deleteAccount = async () => {
     document.body.appendChild(link)
     link.click()
     link.remove()
-    window.URL.revokeObjectURL(url)
-
-    const confirmDel = confirm("Téléchargement terminé. Supprimer maintenant votre compte ?")
-    if (!confirmDel) return
-
-    await axios.delete('http://127.0.0.1:8000/api/users/me/delete/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-
+    await axios.delete('http://127.0.0.1:8000/api/users/me/delete/', { headers })
     alert("Votre compte a été supprimé avec succès.")
     localStorage.clear()
     window.location.href = '/login'
   } catch (err) {
-    console.error('Erreur pendant la suppression du compte :', err)
+    console.error('Erreur suppression du compte :', err)
   }
 }
 
 const markAsRead = async (msg) => {
   if (msg.is_read) return
-
-  const token = localStorage.getItem('access_token')
   try {
-    await axios.patch(`http://127.0.0.1:8000/api/users/messages/${msg.id}/`, {
-      is_read: true
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    await axios.patch(`http://127.0.0.1:8000/api/users/messages/${msg.id}/`, { is_read: true }, { headers })
     msg.is_read = true
   } catch (err) {
-    console.error('Erreur mise à jour lecture message :', err)
+    console.error('Erreur lecture message :', err)
+  }
+}
+
+const toggleNewsletter = async () => {
+  const action = subscribed.value ? 'unsubscribe' : 'subscribe'
+  try {
+    const response = await axios.post(`http://127.0.0.1:8000/api/newsletter/${action}/`, {
+      email: user.value.email
+    })
+    subscribed.value = !subscribed.value
+    alert(subscribed.value ? '✅ Inscription réussie.' : '🚫 Désinscription confirmée.')
+    console.log(`✅ Réponse ${action} :`, response.data)
+  } catch (err) {
+    console.error(`❌ Erreur ${action} newsletter :`, err)
+    alert('Erreur : ' + (err.response?.data?.error || 'Impossible de modifier l\'abonnement.'))
+  }
+}
+
+const checkSubscription = async () => {
+  try {
+    const res = await axios.post(`http://127.0.0.1:8000/api/newsletter/subscribe/`, {
+      email: user.value.email
+    })
+    if (res.data?.message?.includes('Inscription')) {
+      subscribed.value = true
+    }
+  } catch (err) {
+    console.log('ℹ️ Résultat checkSubscription :', err.response?.data)
+    if (err.response?.data?.error === 'Déjà inscrit à la newsletter.') {
+      subscribed.value = true
+    } else {
+      subscribed.value = false
+    }
   }
 }
 

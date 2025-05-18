@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #777;
+      text-align: center;
+    }
+    a.unsubscribe {
+      color: #e63946;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>{{ subject }}</h2>
+    <div>
+      {{ body|safe }}
+    </div>
+
+    <div class="footer">
+      Vous recevez cet email car vous êtes abonné(e) à notre newsletter FarmShop.<br>
+      <a class="unsubscribe" href="{{ unsubscribe_url }}">Se désabonner</a>
+    </div>
+  </div>
+</body>
+</html>

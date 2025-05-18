@@ -128,9 +128,10 @@ class RegisterView(generics.CreateAPIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             current_site = get_current_site(request)
             activation_link = f"http://{current_site.domain}/api/users/confirm/{uid}/{token}/"
+            unsubscribe_link = f"http://{current_site.domain}/api/users/unsubscribe/{uid}/{token}/"
 
             subject = "Activation de votre compte FarmShop"
-            message = f"Bonjour {user.username},\n\nMerci de vous être inscrit sur FarmShop !\n\nVeuillez cliquer sur le lien ci-dessous pour activer votre compte :\n\n{activation_link}\n\nSi vous n'avez pas demandé cette inscription, ignorez ce message."
+            message = f"Bonjour {user.username},\n\nMerci de vous être inscrit sur FarmShop !\n\nVeuillez cliquer sur le lien ci-dessous pour activer votre compte :\n{activation_link}\n\nSi vous ne souhaitez plus recevoir d'emails de notre part, vous pouvez vous désabonner ici :\n{unsubscribe_link}"
 
             send_mail(subject, message, None, [user.email], fail_silently=False)
             return Response({"message": "Inscription réussie. Vérifiez votre boîte mail."}, status=201)
@@ -152,6 +153,23 @@ def confirm_email(request, uidb64, token):
         return redirect('http://localhost:5173/activation-success')
     else:
         return redirect('http://localhost:5173/activation-failed')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def unsubscribe_newsletter(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (User.DoesNotExist, ValueError, OverflowError):
+        return redirect('http://localhost:5173/unsubscribe-failed')
+
+    if default_token_generator.check_token(user, token):
+        user.wants_newsletter = False
+        user.save()
+        return redirect('http://localhost:5173/unsubscribed-success')
+    else:
+        return redirect('http://localhost:5173/unsubscribe-failed')
 
 
 class UserViewSet(viewsets.ModelViewSet):
