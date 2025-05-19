@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'orders',
     'users',
     'newsletter',
+    'contact',
     'rest_framework.authtoken',
     'django_filters',
     'drf_spectacular',

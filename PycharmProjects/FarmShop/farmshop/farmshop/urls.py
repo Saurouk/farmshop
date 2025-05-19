@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 from users.views import RegisterView, CustomTokenObtainPairView
 
 from django.conf import settings
@@ -17,13 +17,14 @@ urlpatterns = [
     path('api/blog/', include('blog.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
+    path('api/users/', include('users.urls')),
+    path('api/newsletter/', include('newsletter.urls')),
+    path('api/contact/', include('contact.urls')),
 
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('api/users/', include('users.urls')),
-    path('api/newsletter/', include('newsletter.urls')),
     path('api-auth/', include('rest_framework.urls')),
 ]
 

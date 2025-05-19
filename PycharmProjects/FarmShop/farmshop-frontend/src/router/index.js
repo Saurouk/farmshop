@@ -14,7 +14,7 @@ const routes = [
   { path: '/products/:id', component: ProductDetailView },
   { path: '/blog', component: BlogView },
   { path: '/blog/:id', component: () => import('@/views/ArticleDetail.vue') },
-  { path: '/contact', component: ContactView },
+  { path: '/contact', name: 'ContactView', component: ContactView },
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
 
@@ -28,7 +28,6 @@ const routes = [
     name: 'ActivationFailed',
     component: () => import('@/views/ActivationFailedView.vue')
   },
-
   {
     path: '/profile',
     name: 'UserProfile',
