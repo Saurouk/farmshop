@@ -3,23 +3,29 @@ import Navbar from './components/Navbar.vue';
 </script>
 
 <template>
-  <div>
+  <div id="app" class="app-background">
     <Navbar />
-    <div class="container mt-4">
-      <router-view></router-view>
-    </div>
+    <main class="page-content">
+      <router-view />
+    </main>
   </div>
 </template>
 
 <style>
-
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
+  background-color: #f4f9f4 !important; /* vert clair */
 }
 
-h1 {
-  text-align: center;
-  color: #2E7D32;
+.app-background {
+  min-height: 100vh;
+  background-color: #f4f9f4;
+}
+
+.page-content {
+  padding-top: 60px; /* espace pour éviter que la navbar cache le contenu */
 }
 </style>
