@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture #{{ order.id }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      font-size: 14px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header, .footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .details, .totals {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .details th, .details td, .totals th, .totals td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    .details th {
+      background-color: #f5f5f5;
+    }
+    .totals td {
+      text-align: right;
+    }
+    .totals td.label {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Facture</h1>
+
+  <div class="header">
+    <p><strong>Commande n°:</strong> {{ order.id }}</p>
+    <p><strong>Date:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+    <p><strong>Client:</strong> {{ order.user.username }}</p>
+  </div>
+
+  <table class="details">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.price_per_unit }} €</td>
+        <td>{{ item.quantity|floatformat:2 }} €</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td class="label"><strong>Total TTC</strong></td>
+      <td><strong>{{ order.total_price }} €</strong></td>
+    </tr>
+    <tr>
+      <td class="label">TVA incluse</td>
+      <td>✅</td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    <p>Merci pour votre commande sur FarmShop 🌾</p>
+  </div>
+</body>
+</html>
