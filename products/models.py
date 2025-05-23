@@ -1,6 +1,7 @@
 import logging
 from django.conf import settings
 from django.db import models
+from django.utils.translation import get_language
 
 logger = logging.getLogger(__name__)
 
@@ -11,14 +12,20 @@ UNIT_CHOICES = [
 ]
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+    name_i18n = models.JSONField(default=dict)  # e.g. {"en": "Fruits", "fr": "Fruits"}
+
+    def get_translated_name(self):
+        lang = get_language()
+        return self.name_i18n.get(lang, self.name_i18n.get("en", ""))
 
     def __str__(self):
-        return self.name
+        return self.get_translated_name()
+
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
+    name_i18n = models.JSONField(default=dict)
+    description_i18n = models.JSONField(default=dict)
+
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
     low_stock_threshold = models.PositiveIntegerField(default=5)
@@ -48,21 +55,31 @@ class Product(models.Model):
 
     def check_stock(self):
         if self.is_low_stock():
-            logger.warning(f"Low stock alert: {self.name} has only {self.stock} left!")
+            logger.warning(f"Low stock alert: {self.name_i18n.get('en', 'Unnamed')} has only {self.stock} left!")
+
+    def get_translated_name(self):
+        lang = get_language()
+        return self.name_i18n.get(lang, self.name_i18n.get("en", ""))
+
+    def get_translated_description(self):
+        lang = get_language()
+        return self.description_i18n.get(lang, self.description_i18n.get("en", ""))
 
     def save(self, *args, **kwargs):
         self.check_stock()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return self.get_translated_name()
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/gallery/')
 
     def __str__(self):
-        return f"Image for {self.product.name}"
+        return f"Image for {self.product.get_translated_name()}"
+
 
 class Rental(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -79,7 +96,8 @@ class Rental(models.Model):
         return True
 
     def __str__(self):
-        return f"{self.user.username} - {self.product.name} ({'Active' if self.is_active else 'Canceled'})"
+        return f"{self.user.username} - {self.product.get_translated_name()} ({'Active' if self.is_active else 'Canceled'})"
+
 
 class Wishlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
@@ -91,4 +109,4 @@ class Wishlist(models.Model):
         ordering = ['-added_at']
 
     def __str__(self):
-        return f"{self.user.username} ❤️ {self.product.name}"
+        return f"{self.user.username} ❤️ {self.product.get_translated_name()}"

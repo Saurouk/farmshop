@@ -1,15 +1,34 @@
 from rest_framework import serializers
 from .models import Product, Rental, Category, Wishlist, ProductImage, UNIT_CHOICES
+from django.utils.translation import get_language
+
 
 class CategorySerializer(serializers.ModelSerializer):
+    name_i18n = serializers.JSONField()
+    name = serializers.SerializerMethodField()
+    name_fr = serializers.SerializerMethodField()
+    name_en = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name_i18n', 'name', 'name_fr', 'name_en']
+
+    def get_name(self, obj):
+        lang = get_language()
+        return obj.name_i18n.get(lang, obj.name_i18n.get('en', ''))
+
+    def get_name_fr(self, obj):
+        return obj.name_i18n.get('fr', '')
+
+    def get_name_en(self, obj):
+        return obj.name_i18n.get('en', '')
+
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ['id', 'image']
+
 
 class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
@@ -17,7 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
         source='category',
         write_only=True
     )
-    category = serializers.StringRelatedField(read_only=True)
+    category = CategorySerializer(read_only=True)
     unit_of_measure = serializers.ChoiceField(choices=UNIT_CHOICES, default='piece')
     is_available = serializers.ReadOnlyField()
     image = serializers.ImageField(required=False, allow_null=True)
@@ -31,12 +50,17 @@ class ProductSerializer(serializers.ModelSerializer):
     liked_by_user = serializers.SerializerMethodField()
     views = serializers.IntegerField(read_only=True)
 
+    name_i18n = serializers.JSONField()
+    description_i18n = serializers.JSONField()
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = [
-            'id', 'name', 'description', 'price', 'stock',
-            'low_stock_threshold', 'is_available', 'category_id',
-            'category', 'unit_of_measure', 'image', 'images',
+            'id', 'name_i18n', 'description_i18n', 'name', 'description',
+            'price', 'stock', 'low_stock_threshold', 'is_available',
+            'category_id', 'category', 'unit_of_measure', 'image', 'images',
             'images_upload', 'is_rentable',
             'likes_count', 'liked_by_user', 'views'
         ]
@@ -64,10 +88,20 @@ class ProductSerializer(serializers.ModelSerializer):
             return request.user in obj.likes.all()
         return False
 
+    def get_name(self, obj):
+        lang = get_language()
+        return obj.name_i18n.get(lang, obj.name_i18n.get('en', ''))
+
+    def get_description(self, obj):
+        lang = get_language()
+        return obj.description_i18n.get(lang, obj.description_i18n.get('en', ''))
+
+
 class RentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = '__all__'
+
 
 class WishlistSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(

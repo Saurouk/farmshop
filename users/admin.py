@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Message
+from django.contrib.auth.admin import UserAdmin
+from .models import User, Message
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    pass
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
