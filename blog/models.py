@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.db import models
+from django.utils.translation import get_language
+
 
 class Article(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.TextField()
+    title_i18n = models.JSONField(default=dict)  # e.g. {"fr": "Titre", "en": "Title"}
+    content_i18n = models.JSONField(default=dict)  # e.g. {"fr": "Contenu", "en": "Content"}
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -13,19 +15,31 @@ class Article(models.Model):
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_articles', blank=True)
     views = models.PositiveIntegerField(default=0)
 
+    def get_translated_title(self):
+        lang = get_language()
+        return self.title_i18n.get(lang, self.title_i18n.get('en', ''))
+
+    def get_translated_content(self):
+        lang = get_language()
+        return self.content_i18n.get(lang, self.content_i18n.get('en', ''))
 
     def __str__(self):
-        return self.title
+        return self.get_translated_title()
 
 
 class Comment(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content = models.TextField()
+    content_i18n = models.JSONField(default=dict)  # e.g. {"fr": "Commentaire", "en": "Comment"}
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_translated_content(self):
+        lang = get_language()
+        return self.content_i18n.get(lang, self.content_i18n.get("en", ""))
+
     def __str__(self):
-        return f"Comment by {self.user.username} on {self.article.title}"
+        return f"Comment by {self.user.username} on {self.article.get_translated_title()}"
+
 
 class Report(models.Model):
     reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
