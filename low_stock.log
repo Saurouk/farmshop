@@ -14604,3 +14604,278 @@ Bad Request: /api/newsletter/subscribe/
 "POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
 Bad Request: /api/newsletter/subscribe/
 "POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Internal Server Error: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 500 52
+Internal Server Error: /api/cart/remove_item/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 86, in post
+    return Response({'message': _(f"Removed {quantity} unit(s) of {product.name} from cart.")}, status=200)
+                                                                   ^^^^^^^^^^^^
+AttributeError: 'Product' object has no attribute 'name'
+"POST /api/cart/remove_item/ HTTP/1.1" 500 96694
+Internal Server Error: /api/cart/remove_item/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 86, in post
+    return Response({'message': _(f"Removed {quantity} unit(s) of {product.name} from cart.")}, status=200)
+                                                                   ^^^^^^^^^^^^
+AttributeError: 'Product' object has no attribute 'name'
+"POST /api/cart/remove_item/ HTTP/1.1" 500 96694
+Internal Server Error: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 500 52
+Internal Server Error: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 500 52
+Internal Server Error: /api/cart/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\views.py", line 16, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 573, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 540, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+                            ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\cart\serializers.py", line 27, in to_representation
+    product['total_price'] = round(product['price'] * quantity, 2)
+                             ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: type str doesn't define __round__ method
+"GET /api/cart/ HTTP/1.1" 500 122475
+Bad Request: /api/cart/add_item/
+"POST /api/cart/add_item/ HTTP/1.1" 400 35
+Unauthorized: /api/products/4/
+"PUT /api/products/4/ HTTP/1.1" 401 58
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 4648
+Internal Server Error: /api/products/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 422, in __getattr__
+    return getattr(_request, attr)
+AttributeError: 'WSGIRequest' object has no attribute 'LANGUAGE_CODE'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 540, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+                            ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\fields.py", line 1870, in to_representation
+    return method(value)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 96, in get_name
+    lang = self._get_language()
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 105, in _get_language
+    return request.LANGUAGE_CODE if request else get_language()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 424, in __getattr__
+    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+AttributeError: 'Request' object has no attribute 'LANGUAGE_CODE'
+"GET /api/products/?page=1 HTTP/1.1" 500 150922
+Internal Server Error: /api/products/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 422, in __getattr__
+    return getattr(_request, attr)
+AttributeError: 'WSGIRequest' object has no attribute 'LANGUAGE_CODE'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 540, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+                            ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\fields.py", line 1870, in to_representation
+    return method(value)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 96, in get_name
+    lang = self._get_language()
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 105, in _get_language
+    return request.LANGUAGE_CODE if request else get_language()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 424, in __getattr__
+    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+AttributeError: 'Request' object has no attribute 'LANGUAGE_CODE'
+"GET /api/products/?page=1 HTTP/1.1" 500 150796
+Internal Server Error: /api/products/
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 422, in __getattr__
+    return getattr(_request, attr)
+AttributeError: 'WSGIRequest' object has no attribute 'LANGUAGE_CODE'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\mixins.py", line 43, in list
+    return self.get_paginated_response(serializer.data)
+                                       ^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\serializers.py", line 540, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+                            ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\fields.py", line 1870, in to_representation
+    return method(value)
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 96, in get_name
+    lang = self._get_language()
+  File "C:\Users\Master\PycharmProjects\FarmShop\farmshop\products\serializers.py", line 105, in _get_language
+    return request.LANGUAGE_CODE if request else get_language()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Master\AppData\Roaming\Python\Python313\site-packages\rest_framework\request.py", line 424, in __getattr__
+    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+AttributeError: 'Request' object has no attribute 'LANGUAGE_CODE'
+"GET /api/products/?page=1 HTTP/1.1" 500 150796

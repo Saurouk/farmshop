@@ -14,7 +14,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name_i18n', 'name', 'name_fr', 'name_en']
 
     def get_name(self, obj):
-        lang = get_language()
+        lang = self._get_context_language()
         return obj.name_i18n.get(lang, obj.name_i18n.get('en', ''))
 
     def get_name_fr(self, obj):
@@ -22,6 +22,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_name_en(self, obj):
         return obj.name_i18n.get('en', '')
+
+    def _get_context_language(self):
+        request = self.context.get('request')
+        if request:
+            return getattr(request, 'LANGUAGE_CODE', get_language())
+        return get_language()
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -89,12 +95,18 @@ class ProductSerializer(serializers.ModelSerializer):
         return False
 
     def get_name(self, obj):
-        lang = get_language()
+        lang = self._get_context_language()
         return obj.name_i18n.get(lang, obj.name_i18n.get('en', ''))
 
     def get_description(self, obj):
-        lang = get_language()
+        lang = self._get_context_language()
         return obj.description_i18n.get(lang, obj.description_i18n.get('en', ''))
+
+    def _get_context_language(self):
+        request = self.context.get('request')
+        if request:
+            return getattr(request, 'LANGUAGE_CODE', get_language())
+        return get_language()
 
 
 class RentalSerializer(serializers.ModelSerializer):
