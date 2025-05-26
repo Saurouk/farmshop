@@ -14879,3 +14879,9 @@ Traceback (most recent call last):
     raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
 AttributeError: 'Request' object has no attribute 'LANGUAGE_CODE'
 "GET /api/products/?page=1 HTTP/1.1" 500 150796
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /api/categories/
+"GET /api/categories/ HTTP/1.1" 404 4660
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 4648
