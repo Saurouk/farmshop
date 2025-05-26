@@ -1,15 +1,16 @@
 from django.db import models
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from products.models import Product
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('confirmed', 'Confirmed'),
-        ('preparing', 'Preparing'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('canceled', 'Canceled'),
+        ('pending', _('En attente')),
+        ('confirmed', _('Confirmée')),
+        ('preparing', _('Préparation')),
+        ('shipped', _('Expédiée')),
+        ('delivered', _('Livrée')),
+        ('canceled', _('Annulée')),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")

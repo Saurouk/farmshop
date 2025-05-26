@@ -17,6 +17,7 @@ from .serializers import OrderSerializer
 from .permissions import IsAdminUser
 from dotenv import load_dotenv
 from pathlib import Path
+from django.utils.translation import gettext as _
 import os
 from products.models import Product, Rental
 
@@ -32,14 +33,14 @@ class CreateOrderView(APIView):
         try:
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
-            return Response({"error": "Votre panier est vide. Ajoutez des produits avant de passer une commande."}, status=400)
+            return Response({"error": _("Votre panier est vide. Ajoutez des produits avant de passer une commande.")}, status=400)
 
         if not cart.items.exists():
-            return Response({"error": "Votre panier est vide. Ajoutez des produits avant de passer une commande."}, status=400)
+            return Response({"error": _("Votre panier est vide. Ajoutez des produits avant de passer une commande.")}, status=400)
 
         existing_order = Order.objects.filter(user=request.user, status='paid').exists()
         if existing_order:
-            return Response({"error": "Vous avez déjà une commande payée en attente."}, status=400)
+            return Response({"error": _("Vous avez déjà une commande payée en attente.")}, status=400)
 
         order = Order.objects.create(user=request.user, total_price=0)
         total_price = 0
@@ -47,13 +48,13 @@ class CreateOrderView(APIView):
         for item in cart.items.all():
             if item.quantity > item.product.stock:
                 return Response(
-                    {"error": f"Stock insuffisant : {item.product.stock} unités restantes pour {item.product.name}."},
+                    {"error": _(f"Stock insuffisant : {item.product.stock} unités restantes pour {item.product.name}.")},
                     status=400,
                 )
 
             if not item.product.is_available:
                 return Response(
-                    {"error": f"Le produit {item.product.name} n'est plus disponible."},
+                    {"error": _(f"Le produit {item.product.name} n'est plus disponible.")},
                     status=400,
                 )
 
@@ -72,7 +73,7 @@ class CreateOrderView(APIView):
         order.save()
         cart.items.all().delete()
 
-        return Response({"message": "Commande créée avec succès", "order_id": order.id}, status=201)
+        return Response({"message": _("Commande créée avec succès"), "order_id": order.id}, status=201)
 
 
 class UserOrdersView(ListAPIView):
@@ -119,7 +120,7 @@ class RentalPaymentIntentView(APIView):
             end_date = request.data.get("end_date")
 
             if not product_id or not start_date or not end_date:
-                return Response({"error": "Données manquantes."}, status=400)
+                return Response({"error": _("Données manquantes.")}, status=400)
 
             product = Product.objects.get(id=product_id)
 
@@ -128,7 +129,7 @@ class RentalPaymentIntentView(APIView):
             rental_days = (end - start).days
 
             if rental_days <= 0:
-                return Response({"error": "Période invalide."}, status=400)
+                return Response({"error": _("Période invalide.")}, status=400)
 
             total_amount = int(product.price * rental_days * 100)
 
@@ -145,7 +146,7 @@ class RentalPaymentIntentView(APIView):
 
             return Response({"client_secret": intent.client_secret})
         except Product.DoesNotExist:
-            return Response({"error": "Produit introuvable."}, status=404)
+            return Response({"error": _("Produit introuvable.")}, status=404)
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -164,10 +165,10 @@ class StripeWebhookView(APIView):
 
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-        except ValueError as e:
-            return Response({"error": "Invalid payload"}, status=400)
-        except stripe.error.SignatureVerificationError as e:
-            return Response({"error": "Invalid signature"}, status=400)
+        except ValueError:
+            return Response({"error": _("Contenu invalide")}, status=400)
+        except stripe.error.SignatureVerificationError:
+            return Response({"error": _("Signature invalide")}, status=400)
 
         if event['type'] == 'payment_intent.succeeded':
             payment_intent = event['data']['object']
@@ -221,7 +222,7 @@ class StripeWebhookView(APIView):
                 logger.error("❌ Erreur Webhook Stripe : %s", str(e))
                 return Response({"error": str(e)}, status=500)
 
-        return Response({"message": "Webhook handled"}, status=200)
+        return Response({"message": _("Webhook traité")}, status=200)
 
 
 class AdminOrderActionsView(APIView):
@@ -231,28 +232,28 @@ class AdminOrderActionsView(APIView):
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
-            return Response({"error": "Commande introuvable."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Commande introuvable.")}, status=status.HTTP_404_NOT_FOUND)
 
         new_status = request.data.get('status')
         if new_status not in dict(Order.STATUS_CHOICES):
-            return Response({"error": "Statut invalide."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Statut invalide.")}, status=status.HTTP_400_BAD_REQUEST)
 
         order.status = new_status
         order.save()
-        return Response({"message": f"Commande {order_id} mise à jour avec le statut {new_status}."}, status=status.HTTP_200_OK)
+        return Response({"message": _(f"Commande {order_id} mise à jour avec le statut {new_status}.")}, status=status.HTTP_200_OK)
 
     def delete(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
-            return Response({"error": "Commande introuvable."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Commande introuvable.")}, status=status.HTTP_404_NOT_FOUND)
 
         if order.status in ['shipped', 'delivered']:
-            return Response({"error": "Impossible d'annuler une commande déjà expédiée ou livrée."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Impossible d'annuler une commande déjà expédiée ou livrée.")}, status=status.HTTP_400_BAD_REQUEST)
 
         order.status = 'canceled'
         order.save()
-        return Response({"message": f"Commande {order_id} annulée avec succès."}, status=status.HTTP_200_OK)
+        return Response({"message": _(f"Commande {order_id} annulée avec succès.")}, status=status.HTTP_200_OK)
 
 
 class GenerateInvoiceView(APIView):
@@ -262,7 +263,7 @@ class GenerateInvoiceView(APIView):
         try:
             order = Order.objects.select_related('user').prefetch_related('items__product').get(id=order_id)
         except Order.DoesNotExist:
-            return Response({'error': 'Commande introuvable.'}, status=404)
+            return Response({'error': _("Commande introuvable.")}, status=404)
 
         html_content = render_to_string('invoice_template.html', {'order': order})
         pdf_file = HTML(string=html_content).write_pdf()
