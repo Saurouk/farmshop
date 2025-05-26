@@ -14588,3 +14588,19 @@ Bad Request: /api/blog/reports/
 "POST /api/blog/reports/ HTTP/1.1" 400 54
 Not Found: /favicon.ico
 "GET /favicon.ico HTTP/1.1" 404 4648
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
+Bad Request: /api/newsletter/subscribe/
+"POST /api/newsletter/subscribe/ HTTP/1.1" 400 44
